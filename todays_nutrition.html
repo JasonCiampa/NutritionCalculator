@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="styles/todays_nutrition.css">
+    <link rel="stylesheet" href="styles/main.css">
+
+    <title>Foods and Meals</title>
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="images/healthy_bowl.png" alt="Click Here to return to homepage" title="Click Here to return to homepage"></a>
+        <h2>Nutrition Calculator</h2>
+        <button id="show_nav_menu_button" data-visible="false"></button>
+    </header>
+
+    <main>
+        <nav id="navigation_menu" data-visible="false">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="foods_and_meals.html">Foods and Meals</a></li>
+                <li><a id="current" href="todays_nutrition.html">Today's Nutrition</a></li>
+                <li><a href="nutrition_log.html">Nutrition Log</a></li>
+            </ul>
+        </nav>
+
+        <section id="daily_nutrition_choices">
+            <h3>Select an option:</h3>
+            <div id="daily_nutrition_buttons">
+                <button id="log_nutrition" onclick="displayForm(logNutritionForm)" >Add a Food/Meal to Today's Nutrition</button>
+                <button id="remove_nutrition" onclick="displayForm(removeNutritionForm)" >Remove a Food/Meal from Today's Nutrition</button>
+            </div>
+
+            <div id="nutrition_log_forms">
+                <form id="log_nutrition_form">
+                    <h3>Enter the name and number of servings for the food/meal you would like to log in today's nutrition:</h3>
+                    <h4><span class="error"></span></h4>
+                    <div id="name_and_servings">
+                        <p>Name: <input type="text" id="log_nutrition_name" autocomplete="off"></p>
+                        <p>Servings: <input type="text" id="log_nutrition_servings" autocomplete="off"></p>
+                    </div>
+
+                    <div id="log_nutrition_bottom_buttons">
+                        <button class="submit" type="button" onclick="processForm(logNutritionForm)">Submit</button>
+                        <button class="quit" type="reset" onclick="closeForm(logNutritionForm)">Quit</button>
+                    </div>
+                </form>
+
+                <form id="remove_nutrition_form">
+                    <h3>Enter the name of the food/meal you would like to remove from today's nutrition:</h3>
+                    <h4><span class="error"></span></h4>
+                    <p>Name: <input type="text" id="remove_nutrition_name" autocomplete="off"></p>
+
+                    <div id="remove_nutrition_bottom_buttons">
+                        <button class="submit" type="button" onclick="processForm(removeNutritionForm)">Submit</button>
+                        <button class="quit" type="reset" onclick="closeForm(removeNutritionForm)">Quit</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section id="daily_nutrition_log">
+           <h2><span id="current_date"></span></h2>
+           <div id="macros">
+            <h2>Calories: <span id="total_calories">0</span></h2>
+            <h2>Carbs: <span id="total_carbs">0</span>g</h2>
+            <h2>Protein: <span id="total_protein">0</span>g</h2>
+            <h2>Fat: <span id="total_fat">0</span>g</h2>
+           </div>
+           <p><span id="eaten_today"></span></p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyright"></span> Jason Ciampa</p>
+    </footer>
+
+    <script src="scripts/nutrition_database.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+/* Add text columns */
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html {
+    background-image: linear-gradient(rgb(109, 196, 255), rgb(0, 102, 255));
+}
+
+body {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    color: white;
+}
+
+/* Header Styles */
+
+header {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    border-bottom: 3px solid blue;
+}
+
+header h2 {
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+header img {
+    max-width: 200px;
+    padding: 1vh;
+}
+
+header h2 {
+    font-size: 200%;
+    padding-bottom: 2vh;
+}
+
+/* Nav Bar Styles */
+nav ul {
+    display: flex;
+    list-style-type: none;
+    justify-content: center;
+    border-bottom: 3px solid blue;
+    background-color: rgb(0, 110, 255);
+}
+
+nav ul li a {
+    padding: 2vh 6vh;
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    color: white;
+    transition: all 300ms;
+}
+
+nav ul li a:hover {
+    background-color: darkblue;
+    cursor: pointer;
+}
+
+#current {
+    color: blue;
+    font-weight: bold;
+}
+
+#current:hover {
+    color: white;
+}
+
+/* Daily Nutrition Home Page Styles */
+
+#sections {
+    display: flex;
+    justify-content: space-evenly;
+    border-bottom: 3px solid blue;
+}
+
+#introduction, #how_to_use {
+    display: flex;
+    flex-direction: column;
+    max-width: 50%;
+    padding: 1vh;
+    text-align: center;
+    width: 100%
+}
+
+#introduction p, #how_to_use p {
+    padding: 1vh;
+}
+
+#introduction h3, #how_to_use h3 {
+    text-align: center;
+}
+
+main h2 {
+    text-align: center;
+    padding: 2vh;
+}
+
+#show_nav_menu_button {
+    display: none;
+}
+
+
+/* Footer Styles */
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2vh;
+}
+
+@media screen and (min-width: 280px) and (max-width: 767px) {
+    html {
+        overflow-x: hidden;
+    }
+
+    #show_nav_menu_button {
+        z-index: 999;
+        width: 25px;
+        aspect-ratio: 1;
+        background-color: transparent;
+        position: absolute;
+        border: none;
+        background-image: url('../images/hamburger.png');
+        background-position: center;
+        background-size: cover;
+        top: 2.5vh;
+        right: 3vh;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #navigation_menu ul {
+        flex-direction: column;
+        margin-top: 30vh;
+        border-bottom: none;
+        background-color: transparent;
+    }
+
+    #current {
+        color: rgb(0, 221, 255);
+    }
+
+    #navigation_menu {
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 65vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 255, 0.8);
+        transform: translateX(100%);
+        transition: all 300ms;
+    }
+
+    #navigation_menu[data-visible='true'] {
+        transform: translateX(0%);
+    }
+
+    #show_nav_menu_button[data-visible='true']{
+        background-image: url(../images/x-icon.png);
+    }
+
+    #show_nav_menu_button {
+        display: block;
+    }
+
+    #sections {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #introduction, #how_to_use {
+        max-width: 90%;
+        text-align: center;
+    }
+
+}
+

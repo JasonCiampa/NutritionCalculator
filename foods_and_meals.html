@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="styles/food_and_meals.css">
+    <link rel="stylesheet" href="styles/main.css">
+
+    <title>Foods and Meals</title>
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="images/healthy_bowl.png" alt="Click Here to return to homepage" title="Click Here to return to homepage"></a>
+        <h2>Nutrition Calculator</h2>
+        <button id="show_nav_menu_button" data-visible="false"></button>
+    </header>
+
+    <main>
+        <nav id="navigation_menu" data-visible="false">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a id="current" href="foods_and_meals.html">Foods and Meals</a></li>
+                <li><a href="todays_nutrition.html">Today's Nutrition</a></li>
+                <li><a href="nutrition_log.html">Nutrition Log</a></li>
+            </ul>
+        </nav>
+
+        <section id="food_meal_choices">
+            <h3>Select an option:</h3>
+            <div id="food_meal_buttons">
+                <button id="add_food" onclick="displayForm(addFoodForm)" >Add/Update a Food</button>
+                <button id="add_meal" onclick="displayForm(addMealForm)">Add/Update a Meal</button>
+                <button id="remove" onclick="displayForm(removeForm)">Remove a Food/Meal</button>
+                <!-- <section id="view_nutrition">View the Nutrition of a Food or Meal</section>
+                <section id="view_registry">View All Foods and Meals</section> -->
+            </div>
+
+            <div id="food_meal_forms">
+                <form id="add_food_form">
+                    <h3>Provide the following data for your food to add it to the registry:<br><br>(If the name of the food that you enter already exists, that food will be updated) </h3>
+                    <h4><span class="error"></span></h4>
+                    <p>Name: <input type="text" id="food_name" autocomplete="off"></p>
+                    <p>Unit of Measurement: <input type="text" id="food_measurement_unit" autocomplete="off"></p>
+                    <p>Serving Size: <input type="text" id="food_serving_size" autocomplete="off"></p>
+                    <p>Calories: <input type="text" id="food_calories" autocomplete="off"></p>
+                    <p>Carbs (in grams): <input type="text" id="food_carbs" autocomplete="off"></p>
+                    <p>Protein (in grams): <input type="text" id="food_protein" autocomplete="off"></p>
+                    <p>Fat (in grams): <input type="text" id="food_fat" autocomplete="off"></p>
+
+                    <div id="add_food_bottom_buttons">
+                        <button class="submit" type="button" onclick="processForm(addFoodForm)">Submit</button>
+                        <button class="quit" type="reset" onclick="closeForm(addFoodForm)">Quit</button>
+                    </div>
+                </form>
+
+                <form id="add_meal_form">
+                    <h3>Provide the following data for your meal to add it to the registry:<br><br>(If the name of the meal that you enter already exists, that meal will be updated) </h3>
+                    <h4><span class="error"></span></h4>
+                    <p>Name: <input type="text" id="meal_name" autocomplete="off"></p>
+                    <div id="ingredients">
+                        <div class="ingredient_and_serving">
+                            <p>Ingredient: <input type="text" class="meal_ingredients" autocomplete="off"></p>  
+                            <p>Servings: <input type="text" class="meal_serving_sizes" autocomplete="off"></p>
+                        </div>
+                    </div>
+
+                    <div id="add_remove_buttons">
+                        <button id="add_ingredient" type="button" onclick="addIngredient()">Add Ingredient</button>
+                        <button id="remove_ingredient" type="button" onclick="removeIngredient()">Remove Ingredient</button>
+                    </div>
+
+                    <div id="add_meal_bottom_buttons">
+                        <button class="submit" type="button" onclick="processForm(addMealForm)">Submit</button>
+                        <button class="quit" type="reset" onclick="closeForm(addMealForm)">Quit</button>
+                        
+                    </div>
+                </form>
+
+                <form id="remove_form">
+                    <h3>Enter the name of the food/meal you would like to delete from the registry:</h3>
+                    <h4><span class="error"></span></h4>
+                    <p>Name: <input type="text" id="remove_name" autocomplete="off"></p>
+
+                    <div id="remove_bottom_buttons">
+                        <button class="submit" type="button" onclick="processForm(removeForm)">Submit</button>
+                        <button class="quit" type="reset" onclick="closeForm(removeForm)">Quit</button>
+                    </div>
+                </form>
+                
+
+                <form action=""></form>
+                <form action=""></form>
+            </div>
+        </section>
+
+        <div id="food_and_meal_lists">
+            <section id="food_list">
+                <h3>Foods:</h3>
+                <span id="list_of_foods"></span>
+            </section>
+    
+            <section id="meal_list">
+                <h3>Meals:</h3>
+                <span id="list_of_meals"></span>
+            </section>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyright"></span> Jason Ciampa</p>
+    </footer>
+
+    <script src="scripts/nutrition_database.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

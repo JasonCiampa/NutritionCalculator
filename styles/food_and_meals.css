@@ -1,0 +1,205 @@
+/* Foods and Meals Choices Styles */
+#food_meal_choices {
+    display: flex;
+    flex-direction: column;
+    padding: 2vh;
+    text-align: center;
+    border-bottom: 3px solid blue;
+    width: 100%
+}
+
+#food_meal_choices h3 {
+    padding-bottom: 3vh;
+    font-weight: bold;
+}
+
+#food_meal_buttons {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#food_meal_buttons button {
+    padding: 3vh;
+    border: 3px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 1px solid darkblue;
+    background-color: rgb(0, 86, 198);
+    transition: 300ms ease;
+}
+
+#food_meal_buttons button:hover {
+    background-color: darkblue;
+    cursor: pointer;
+}
+
+#food_meal_buttons button:active {
+    background-color: rgb(0, 110, 255);
+}
+
+/* Food and Meal Forms Styles */
+
+#food_meal_forms {
+    display: flex;
+    justify-content: center;
+    padding-top: 5vh;
+    margin: auto;
+}
+
+#food_meal_forms #add_food_form {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    padding: 3vh;
+    border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 3px solid darkblue;
+    background-color: rgb(0, 110, 255);
+    transition: 300ms ease;
+}
+
+#food_meal_forms p {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5vh 0;
+}
+
+#food_meal_forms #add_meal_form {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    padding: 3vh;
+    border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 3px solid darkblue;
+    background-color: rgb(0, 110, 255);
+    transition: 300ms ease;
+}
+
+
+.ingredient_and_serving  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+input {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    text-align: center;
+    padding: 0.5vh 0;
+}
+
+#food_meal_forms #ingredients {
+    display: flex;
+    flex-direction: column;
+}
+
+#food_meal_forms .ingredient_and_serving {
+    display: flex;
+}
+
+#food_meal_forms #modify_form {
+    display: none;
+    flex-direction: column;
+    padding: 3vh;
+    border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 3px solid darkblue;
+    background-color: rgb(0, 110, 255);
+    transition: 300ms ease;
+}
+
+#food_meal_forms #remove_form {
+    display: none;
+    flex-direction: column;
+    padding: 3vh;
+    border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 3px solid darkblue;
+    background-color: rgb(0, 110, 255);
+    transition: 300ms ease;
+}
+
+#food_meal_forms .submit, .quit, #add_ingredient, #remove_ingredient {
+    padding: 1vh;
+    border: 3px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 1px solid darkblue;
+    background-color: rgb(0, 55, 255);
+    transition: 300ms ease;
+}
+
+#add_remove_buttons {
+    display: flex;
+    justify-content: space-evenly
+}
+
+#food_meal_forms #add_ingredient, #remove_ingredient {
+    margin-bottom: 2vh;
+}
+
+#food_meal_forms .submit:hover, .quit:hover, #add_ingredient:hover, #remove_ingredient:hover {
+    background-color: darkblue;
+}
+
+#food_meal_forms .submit:active, .quit:active, #add_ingredient:active, #remove_ingredient:active {
+    background-color: rgb(0, 110, 255);
+}
+
+
+/* Food and Meal Lists Styles */
+
+#food_and_meal_lists {
+    display: flex;
+    justify-content: space-evenly;
+    border-bottom: 3px solid blue;
+}
+
+#food_list, #meal_list {
+    display: flex;
+    flex-direction: column;
+    max-width: 50%;
+    padding: 1vh;
+    text-align: center;
+    width: 100%
+}
+
+#food_list p, #meal_list p {
+    padding: 1vh;
+}
+
+#food_list, #meal_list {
+    text-align: center;
+}
+
+@media screen and (min-width: 280px) and (max-width: 767px) {
+    #food_meal_buttons {
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    #food_meal_forms #add_meal_form {
+        width: 100%;
+    }
+
+    .ingredient_and_serving {
+        justify-content: space-evenly;
+    }
+
+    .ingredient_and_serving input {
+        width: 100%;
+    }
+}

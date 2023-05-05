@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="styles/main.css">
+
+    <link id="firebase" href="gs://nutrition-calculator-2094f.appspot.com">
+
+    <title>Nutrition Calculator</title>
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="images/healthy_bowl.png" alt="Click Here to return to homepage" title="Click Here to return to homepage"></a>
+        <h2>Nutrition Calculator</h2>
+        <button id="show_nav_menu_button" data-visible="false"></button>
+    </header>
+
+    <main>
+        <nav id="navigation_menu" data-visible="false">
+            <ul>
+                <li><a id="current" href="index.html">Home</a></li>
+                <li><a href="foods_and_meals.html">Foods and Meals</a></li>
+                <li><a href="todays_nutrition.html">Today's Nutrition</a></li>
+                <li><a href="nutrition_log.html">Nutrition Log</a></li>
+            </ul>
+        </nav>
+
+        <h2>Welcome!</h2>
+
+        <div id="sections">
+            <section id="introduction">
+                <h3>Introduction</h3>
+                <p>
+                    This website serves as a free and convenient personal nutrition calculator. 
+                    Users are able to develop a personal registry of foods and meals. 
+                    These foods and meals can then be registered into a daily nutrition log. 
+                    The daily nutrition log will keep track of a user's total calories, carbs, protein, and fat for the day. 
+                    At the end of the day, the daily nutrition log is added to a collection of past nutrition logs that the user can view. 
+                    This collection serves as a journal of sorts so that the user can track their eating habits. 
+                    Upon the start of a new day, the daily nutrition log is reset automatically.
+                </p>
+                <p>
+                    The world of nutrition is quite complicated, and it can be very overwhelming to many.
+                    To make matters worse, there is a lot of misinformation out there that only adds to the confusion.
+                    Additionally, everybody has a different body type, and that can make proper advice more difficult to obtain. 
+                    Even if accurate information is acquired, it might only apply to people with specific body types. 
+                    There are, however, some generalized facts and practices that can help virtually everybody. 
+                    For beginners, it is best to start by tracking calories and the three macronutrients (carbs, fat, and protein). 
+                    The purpose of this calculator is to help people track of their calories and macros, and by doing so, allow users to begin building a better understand of nutrition. 
+                    Setting calorie and macro goals is important, and reaching those goals can be a very rewarding experience. 
+                    In order to understand what you're working towards, some knowledge of those four components is necessary. 
+                </p>
+                <p>
+                    Calories are a measurement of a food&apos;s energy content, or in other words, how much energy a food has.
+                    Typically, people gauge calories in ranges, like the maintenance calorie range, for example.
+                    The mainenance calorie range is simply the range of calories a person can consume to maintain their weight.
+                    Determining what this range is for yourself is helpful, because once you figure out your maintenance calorie range, you'll know how much or how little you can eat without gaining or losing weight. 
+                    It is also helpful because you can base other calorie ranges off of your maintenance calorie range.
+                    A calorie deficit range is used for losing weight, and a healthy one is set at 500 calories lower than your maintenace calorie range.
+                    A calorie surplus range is used for gaining weight, and a healthy one is set at 500 calories higher than your maintenace calorie range.
+                </p>
+                <p>
+                    Carbohydrates (carbs) are a source of quick energy for the body.
+                    That is why many people will eat carbs before exercising, as it will provide them with enough energy to excel in their workout.
+                    Every 1 gram (g) of carbs is equivalent to 4 calories.
+                    Keeping track of measurements such as that one will help with making the most of your calories for the day, especially while in a deficit.
+                </p>
+                <p>
+                    Protein is the macronutrient responsible for muscle growth.
+                    That is why many people who exercise try to consume a lot of protein.
+                    In order to make considerable progress in terms of muscle growth, a person should try to consume 1g of protein for every 1 pound of their bodyweight each day.
+                    For example, if you weigh 200 pounds, you would want to aim for 200g of protein a day.
+                    Every 1g of protein is equivalent to 4 calories.
+                </p>
+                <p>
+                    Fats are a source of long term energy for the body.
+                    Fats have a bad reputation because &quot;fat&quot; is the term associated with being overweight.
+                    The reality of the situation is that some fats are in fact bad for you, like saturated fats, but a lot of fats are actually really healthy, like unsaturated fats.
+                    Every 1g of fat is equivalent to 9 calories
+                </p>
+                <p>
+                    Hopefully this calculator can be of good use!
+                    If you are a beginner, I recommend that finding your maintenance calorie range is a great way to start.
+                    To do this, eat how you normally do for about a week and log your food and meals with this calculator.
+                    Weigh yourself at the beginning and end of the week. If there is no weight gain or loss, then the average number of calories you consumed throughout the week is likely your maintenance calorie range.
+                    With that determined, you can now decide whether you'd like to maintain your bodyweight, or if you'd like to enter a calorie deficit to lose weight, or if you'd like to enter a calorie surplus to gain weight.
+                    Happy tracking!
+                </p>
+            </section>
+    
+            <section id="how_to_use">
+                <h3>How to Use</h3>
+                <p>
+                    The &quot;Foods and Meals&quot; page is where you will be able to manage the foods and meals in your personal registry.
+                    There are four options to choose from on that page.
+                    The first option is to &quot;Add a Food&quot;.
+                    Upon selecting this option, you will be prompted to provide information about the food you wish to add.
+                    This information includes: <br> The name of the food <br> The unit of measurement &#40;ounces, grams, cups, or maybe the food itself, like in the case of an egg&#41; <br>
+                    The serving size &#40;how many of your unit of measurement&#41; <br>
+                    The number of calories in one serving<br>
+                    The number of grams of carbs in one serving <br>
+                    The number of grams of protein in one serving <br>
+                    The number of grams of fat in one serving <br>
+                </p>
+                <p>
+                    The second option is to &quot;Add a Meal&quot;, which requires you to enter the name of the ingredient&#40;s&#41; alongside the serving size of the ingredient&#40;s&#41;.
+                    Meals can contain any number of ingredients, and you can add more ingredients by clicking the &quot;Add Ingredient&quot; button. 
+                    Reversely, you can remove the most recently added ingredient by clicking the &quot;Remove Ingredient&quot; button.
+                </p>
+                <p>
+                    The third option is to &quot;Modify a Food&#47;Meal&quot;, which requires you to enter the name of the food&#47;meal you'd like to make changes to.
+                    Once a name has been entered, a form will appear that looks identical to either the food form or meal form from the previous two options.
+                    You can type in new values and click &quot;Submit&quot; to save them.
+                </p>
+                <p>
+                    The fourth and final option is to &quot;Remove a Food&#47;Meal&quot;, which requires you to enter the name of the food&#47;meal you'd like to remove.
+                    After that is entered, your selection will be removed from the registry and you won't have to provide any further information.
+                </p>
+                <p>
+                    The &quot;Today&apos;s Nutrition&quot; page is where you will be able to update and view your calories and macros for the current day.
+                    This page is currently under construction, but upon completion, there will be two options.
+                    One of these options will be to &quot;Add a Food&#47;Meal to Today&apos;s Nutrition&quot;.
+                    When adding a food, you will need to provide the name of the food as well as the number of servings you would like to log.
+                    When adding a meal, you will just need to provide the name of the meal you would like to log.
+                    The other option will be to &quot;Remove a Food&#47;Meal From Today&apos;s Nutrition&quot;.
+                    This option will only require you to provide the name of the food&#47;meal you would like to remove.
+                    Whether adding or removing to the daily nutrition log, the program will automatically update your calories and macros based on the calories and macros of the foods&#47;meals you are adding.
+                </p>
+                <p>
+                    The &quot;Nutrition Log&quot; page is where you will be able to view a collection of your past daily nutrition logs.
+                    This page serves as a journal of sorts, and allows you to reflect on your calorie and macro intake throughout past days
+                    This page is currently under construction, but upon completion, there will be two options.
+                    One of these options will be to &quot;Search for a Specific Day&apos;s Nutrition Log&quot;, which will allow you to check for a nutrition log of a certain date.
+                    This option will require you to enter the date you would like to search for, and if there is a nutrition log corresponding to your entered date, it will be displayed.
+                    The other option will be to &quot;Modify A Day&apos;s Nutrition&quot;, which will allow you to modify the nutrition log of a certain date.
+                    This option will once again require you to enter the date you would like to find the nutrition log for, and if found, you will be allowed to modify the nutrition log.
+                    The modifications will work similarly to how the &quot;Add a Food&#47;Meal to Today&apos;s Nutrition&quot; and the &quot;Remove a Food&#47;Meal From Today&apos;s Nutrition&quot; options on the &quot;Today&apos;s Nutrition&quot; page functioned.
+                    When modifications are finished, you will be able to click &quot;Submit&quot; to save the changes to the nutrition log.
+                    This can be helpful if you forgot to add a certain food&#47;meal you had eaten the day before.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyright"></span> Jason Ciampa</p>
+    </footer>
+    
+    <script src="scripts/nutrition_database.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

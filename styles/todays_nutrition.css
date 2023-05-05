@@ -1,0 +1,130 @@
+/* Foods and Meals Choices Styles */
+#daily_nutrition_choices {
+    display: flex;
+    flex-direction: column;
+    padding: 2vh;
+    text-align: center;
+    border-bottom: 3px solid blue;
+    width: 100%
+}
+
+#daily_nutrition_choices h3 {
+    padding-bottom: 3vh;
+    font-weight: bold;
+}
+
+#daily_nutrition_buttons {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#daily_nutrition_buttons button {
+    padding: 3vh;
+    border: 3px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 1px solid darkblue;
+    background-color: rgb(0, 86, 198);
+    transition: 300ms ease;
+}
+
+#daily_nutrition_buttons button:hover {
+    background-color: darkblue;
+    cursor: pointer;
+}
+
+#daily_nutrition_buttons button:active {
+    background-color: rgb(0, 110, 255);
+}
+
+/* Food and Meal Forms Styles */
+
+#nutrition_log_forms {
+    display: flex;
+    justify-content: center;
+    padding-top: 5vh;
+    margin: auto;
+}
+
+#nutrition_log_forms #log_nutrition_form {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    padding: 3vh;
+    border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 3px solid darkblue;
+    background-color: rgb(0, 110, 255);
+    transition: 300ms ease;
+}
+
+#nutrition_log_forms p {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5vh 0;
+}
+
+input {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    text-align: center;
+    padding: 0.5vh 0;
+}
+
+#nutrition_log_forms #remove_nutrition_form {
+    display: none;
+    flex-direction: column;
+    padding: 3vh;
+    border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 3px solid darkblue;
+    background-color: rgb(0, 110, 255);
+    transition: 300ms ease;
+}
+
+#nutrition_log_forms .submit, .quit {
+    padding: 1vh;
+    border: 3px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 1px solid darkblue;
+    background-color: rgb(0, 55, 255);
+    transition: 300ms ease;
+}
+
+#nutrition_log_forms .submit:hover, .quit:hover {
+    background-color: darkblue;
+}
+
+#nutrition_log_forms .submit:active, .quit:active {
+    background-color: rgb(0, 110, 255);
+}
+
+/* Daily Nutrition Log */
+#daily_nutrition_log {
+    display: flex;
+    padding: 0 2vh 2vh 2vh;
+    flex-direction: column;
+    text-align: left;
+    justify-content: center;
+    align-items: center;
+}
+
+#daily_nutrition_log #macros {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+
+@media screen and (min-width: 280px) and (max-width: 767px) {
+    #food_meal_buttons {
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+    }
+}

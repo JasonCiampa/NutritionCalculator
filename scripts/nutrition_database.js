@@ -108,9 +108,10 @@ function setNutritionLists() {
 
 */
     var path = window.location.pathname;
+    console.log(path);
     const request = openDatabase();
 
-    if (path === "/foods_and_meals.html") {
+    // if (path === "/foods_and_meals.html") {
         request.onsuccess = function () {
             console.log("Database opened successfully");
             const db = request.result;
@@ -142,7 +143,7 @@ function setNutritionLists() {
         };
     } 
 
-    else if (path === "/todays_nutrition.html") {
+    // else if (path === "/todays_nutrition.html") {
         request.onsuccess = function () {
             console.log("Database opened successfully");
             const db = request.result;
@@ -190,8 +191,8 @@ function setNutritionLists() {
             }
 
         };
-    }
-    }
+    // }
+    // }
 
 // Calls the function whenever the page loads
 window.addEventListener("load", function() {

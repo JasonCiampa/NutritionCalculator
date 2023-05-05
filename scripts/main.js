@@ -11,11 +11,7 @@ function currentDate() {
 
 window.onload = function() {
     currentYear();
-    var path = window.location.pathname;
-
-    if (path === "/todays_nutrition.html") {
-        currentDate();
-    }
+    currentDate();
 }
 
 // Code received from https://masteringjs.io/tutorials/fundamentals/wait-1-second-then

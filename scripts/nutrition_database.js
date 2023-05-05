@@ -108,91 +108,86 @@ function setNutritionLists() {
 
 */
     var path = window.location.pathname;
+    console.log('fart');
     console.log(path);
     const request = openDatabase();
 
     // if (path === "/foods_and_meals.html") {
-        request.onsuccess = function () {
-            console.log("Database opened successfully");
-            const db = request.result;
+    request.onsuccess = function () {
+        console.log("Database opened successfully");
+        const db = request.result;
           
-            const foodTransaction = db.transaction("foods", "readwrite");  
-            const mealTransaction = db.transaction("meals", "readwrite");      
-            const foodStore = foodTransaction.objectStore("foods");
-            const mealStore = mealTransaction.objectStore("meals");
+        const foodTransaction = db.transaction("foods", "readwrite");  
+        const mealTransaction = db.transaction("meals", "readwrite");      
+        const foodStore = foodTransaction.objectStore("foods");
+        const mealStore = mealTransaction.objectStore("meals");
+
+        const foodStoreList = foodStore.getAll();
+        const mealStoreList = mealStore.getAll();
     
-            const foodStoreList = foodStore.getAll();
-            const mealStoreList = mealStore.getAll();
+        foodStoreList.onsuccess = function () {
+            document.getElementById('list_of_foods').innerHTML = '';
     
-            foodStoreList.onsuccess = function () {
-                document.getElementById('list_of_foods').innerHTML = '';
-    
-                for (let i = 0; i < foodStoreList.result.length; i++) {
-                    foodList.push(foodStoreList.result[i].name);
-                    document.getElementById('list_of_foods').innerHTML += (foodList[i]) + "<br>";
-                }
-            };
-    
-            mealStoreList.onsuccess = function () {
-                document.getElementById('list_of_meals').innerHTML = '';
-                for (let i = 0; i < mealStoreList.result.length; i++) {
-                    mealList.push(mealStoreList.result[i].name);
-                    document.getElementById('list_of_meals').innerHTML += (mealList[i]) + "<br>";
-                }
-            };
+            for (let i = 0; i < foodStoreList.result.length; i++) {
+                foodList.push(foodStoreList.result[i].name);
+                document.getElementById('list_of_foods').innerHTML += (foodList[i]) + "<br>";
+            }
         };
-    } 
+    
+        mealStoreList.onsuccess = function () {
+            document.getElementById('list_of_meals').innerHTML = '';
+            for (let i = 0; i < mealStoreList.result.length; i++) {
+                mealList.push(mealStoreList.result[i].name);
+                document.getElementById('list_of_meals').innerHTML += (mealList[i]) + "<br>";
+            }
+        };
 
     // else if (path === "/todays_nutrition.html") {
-        request.onsuccess = function () {
-            console.log("Database opened successfully");
-            const db = request.result;
           
-            const nutritionTransaction = db.transaction("nutrition", "readwrite");
-            const nutritionStore = nutritionTransaction.objectStore("nutrition");
+        const nutritionTransaction = db.transaction("nutrition", "readwrite");
+        const nutritionStore = nutritionTransaction.objectStore("nutrition");
             
-            const currentDate = nutritionStore.get("currentDate");
+        const currentDate = nutritionStore.get("currentDate");
 
-            currentDate.onsuccess = function () {
-                if (currentDate.result.content === document.getElementById('current_date').innerHTML) {
-                    const totalCals = nutritionStore.get("totalCals");
-                    const totalCarbs = nutritionStore.get("totalCarbs");
-                    const totalProtein = nutritionStore.get("totalProtein");
-                    const totalFat = nutritionStore.get("totalFat");
-                    const eatenTodayList = nutritionStore.get("eatenToday");
+        currentDate.onsuccess = function () {
+            if (currentDate.result.content === document.getElementById('current_date').innerHTML) {
+                const totalCals = nutritionStore.get("totalCals");
+                const totalCarbs = nutritionStore.get("totalCarbs");
+                const totalProtein = nutritionStore.get("totalProtein");
+                const totalFat = nutritionStore.get("totalFat");
+                const eatenTodayList = nutritionStore.get("eatenToday");
         
-                    totalCals.onsuccess = function () {
-                        document.getElementById('total_calories').innerHTML = Math.round(totalCals.result.content * 100) / 100;
-                    }
-                    totalCarbs.onsuccess = function () {
-                        document.getElementById('total_carbs').innerHTML = Math.round(totalCarbs.result.content * 100) / 100;
-                    }
-                    totalProtein.onsuccess = function () {
-                        document.getElementById('total_protein').innerHTML = Math.round(totalProtein.result.content * 100) / 100;
-                    }
-                    totalFat.onsuccess = function () {
-                        document.getElementById('total_fat').innerHTML = Math.round(totalFat.result.content * 100) / 100;
-                    }
-                    eatenTodayList.onsuccess = function () {
-                        let currentLog = '';
-                        for (let i = 0; i < eatenTodayList.result.content.length; i++){
-                            currentLog += eatenTodayList.result.content[i];
-                        }
-                        document.getElementById('eaten_today').innerHTML = currentLog;
-                    }
+                totalCals.onsuccess = function () {
+                    document.getElementById('total_calories').innerHTML = Math.round(totalCals.result.content * 100) / 100;
                 }
-                else {
-                    document.getElementById('total_calories').innerHTML = 0;
-                    document.getElementById('total_carbs').innerHTML = 0;
-                    document.getElementById('total_protein').innerHTML = 0;
-                    document.getElementById('total_fat').innerHTML = 0;
-                    document.getElementById('eaten_today').innerHTML = '';
+                totalCarbs.onsuccess = function () {
+                    document.getElementById('total_carbs').innerHTML = Math.round(totalCarbs.result.content * 100) / 100;
+                }
+                totalProtein.onsuccess = function () {
+                    document.getElementById('total_protein').innerHTML = Math.round(totalProtein.result.content * 100) / 100;
+                }
+                totalFat.onsuccess = function () {
+                    document.getElementById('total_fat').innerHTML = Math.round(totalFat.result.content * 100) / 100;
+                }
+                eatenTodayList.onsuccess = function () {
+                    let currentLog = '';
+                    for (let i = 0; i < eatenTodayList.result.content.length; i++){
+                        currentLog += eatenTodayList.result.content[i];
+                    }
+                    document.getElementById('eaten_today').innerHTML = currentLog;
                 }
             }
+            else {
+                document.getElementById('total_calories').innerHTML = 0;
+                document.getElementById('total_carbs').innerHTML = 0;
+                document.getElementById('total_protein').innerHTML = 0;
+                document.getElementById('total_fat').innerHTML = 0;
+                document.getElementById('eaten_today').innerHTML = '';
+            }
+        }
+    };
+}
 
-        };
-    // }
-    // }
 
 // Calls the function whenever the page loads
 window.addEventListener("load", function() {

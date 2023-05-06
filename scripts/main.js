@@ -5,7 +5,6 @@ function currentYear() {
 
 window.onload = function() {
     currentYear();
-    currentDate();
 }
 
 // Code received from https://masteringjs.io/tutorials/fundamentals/wait-1-second-then

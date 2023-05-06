@@ -620,87 +620,75 @@ function processForm(form) {
 
             eatenTodayList.onsuccess = function () {
                 for (let i = 0; i < eatenTodayList.result.content.length; i++) {
-                    if (eatenTodayList.result.content[i].charAt(5) === 'x') {
-                        if (eatenTodayList.result.content[i].slice(7, (name.length + 7)) === name) {
-                            let numServings = parseFloat(eatenTodayList.result.content[i].charAt(4));
-                            eatenTodayList.result = eatenTodayList.result.content.splice(i, 1);
-                            nutritionStore.put(eatenTodayList.result);
-                            const foodTransaction = db.transaction("foods", "readwrite");
-                            const foodStore = foodTransaction.objectStore("foods");
-                            const food = foodStore.get(name);
+                    if (eatenTodayList.result.content[i].slice(7, (name.length + 7)) === name) {
+                        let numServings = parseFloat(eatenTodayList.result.content[i].charAt(4));
+                        eatenTodayList.result = eatenTodayList.result.content.splice(i, 1);
+                        nutritionStore.put(eatenTodayList.result);
+                        const foodTransaction = db.transaction("foods", "readwrite");
+                        const foodStore = foodTransaction.objectStore("foods");
+                        const food = foodStore.get(name);
 
-                            food.onsuccess = function () {
-                                if (food.result != undefined) {
-                                    const totalCals = (parseInt(document.getElementById("total_calories").innerHTML) - ((food.result.cals) * numServings));
-                                    const totalCarbs = Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (parseFloat(food.result.carbs) * numServings)) * 100) / 100;
-                                    const totalProtein = Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (parseFloat(food.result.protein) * numServings)) * 100) / 100;
-                                    const totalFat = Math.round((parseFloat(document.getElementById("total_fat").innerHTML) - (parseFloat(food.result.fat) * numServings)) * 100) / 100;
-                                    document.getElementById("total_calories").innerHTML = totalCals;
-                                    document.getElementById("total_carbs").innerHTML = totalCarbs;
-                                    document.getElementById("total_protein").innerHTML = totalProtein;
-                                    document.getElementById("total_fat").innerHTML = totalFat;
+                        food.onsuccess = function () {
+                            if (food.result != undefined) {
+                                const totalCals = (parseInt(document.getElementById("total_calories").innerHTML) - ((food.result.cals) * numServings));
+                                const totalCarbs = Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (parseFloat(food.result.carbs) * numServings)) * 100) / 100;
+                                const totalProtein = Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (parseFloat(food.result.protein) * numServings)) * 100) / 100;
+                                const totalFat = Math.round((parseFloat(document.getElementById("total_fat").innerHTML) - (parseFloat(food.result.fat) * numServings)) * 100) / 100;
+                                document.getElementById("total_calories").innerHTML = totalCals;
+                                document.getElementById("total_carbs").innerHTML = totalCarbs;
+                                document.getElementById("total_protein").innerHTML = totalProtein;
+                                document.getElementById("total_fat").innerHTML = totalFat;
 
-                                    const nutritionTransaction = db.transaction("nutrition", "readwrite");
-                                    const nutritionStore = nutritionTransaction.objectStore("nutrition");
-                                    nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) });
-                                    nutritionStore.put({ name: "totalCarbs", content: Math.round(parseFloat(document.getElementById("total_carbs").innerHTML) * 100) / 100 });
-                                    nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
-                                    nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
+                                const nutritionTransaction = db.transaction("nutrition", "readwrite");
+                                const nutritionStore = nutritionTransaction.objectStore("nutrition");
+                                nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) });
+                                nutritionStore.put({ name: "totalCarbs", content: Math.round(parseFloat(document.getElementById("total_carbs").innerHTML) * 100) / 100 });
+                                nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
+                                nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
 
-                                    document.getElementById("remove_nutrition_name").value = '';
-                                    closeForm(form);
-                                    setNutritionToday();
-                                }
-                                else {
-                                    const mealTransaction = db.transaction("meals", "readwrite");
-                                    const mealStore = mealTransaction.objectStore("meals");
-                                    const meal = mealStore.get(name);
-        
-                                    meal.onsuccess = function () {
-                                        if (meal.result != undefined) {
-                                            const totalCals = (parseInt(document.getElementById("total_calories").innerHTML) - (meal.result.cals * numServings));
-                                            const totalCarbs = Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (meal.result.carbs * numServings)) * 100) / 100;
-                                            const totalProtein = Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (meal.result.protein * numServings)) * 100) / 100;
-                                            const totalFat = Math.round((parseFloat(document.getElementById("total_fat").innerHTML) - (meal.result.fat * numServings)) * 100) / 100;
-                                            document.getElementById("total_calories").innerHTML = totalCals;
-                                            document.getElementById("total_carbs").innerHTML = totalCarbs;
-                                            document.getElementById("total_protein").innerHTML = totalProtein;
-                                            document.getElementById("total_fat").innerHTML = totalFat;
+                                document.getElementById("remove_nutrition_name").value = '';
+                                closeForm(form);
+                                setNutritionToday();
+                            }
+                            else {
+                                const mealTransaction = db.transaction("meals", "readwrite");
+                                const mealStore = mealTransaction.objectStore("meals");
+                                const meal = mealStore.get(name);
+    
+                                meal.onsuccess = function () {
+                                    if (meal.result != undefined) {
+                                        const totalCals = (parseInt(document.getElementById("total_calories").innerHTML) - (meal.result.cals * numServings));
+                                        const totalCarbs = Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (meal.result.carbs * numServings)) * 100) / 100;
+                                        const totalProtein = Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (meal.result.protein * numServings)) * 100) / 100;
+                                        const totalFat = Math.round((parseFloat(document.getElementById("total_fat").innerHTML) - (meal.result.fat * numServings)) * 100) / 100;
+                                        document.getElementById("total_calories").innerHTML = totalCals;
+                                        document.getElementById("total_carbs").innerHTML = totalCarbs;
+                                        document.getElementById("total_protein").innerHTML = totalProtein;
+                                        document.getElementById("total_fat").innerHTML = totalFat;
 
-                                            const nutritionTransaction = db.transaction("nutrition", "readwrite");
-                                            const nutritionStore = nutritionTransaction.objectStore("nutrition");
-                                            nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) });
-                                            nutritionStore.put({ name: "totalCarbs", content: Math.round(parseFloat(document.getElementById("total_carbs").innerHTML) * 100) / 100 });
-                                            nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
-                                            nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
+                                        const nutritionTransaction = db.transaction("nutrition", "readwrite");
+                                        const nutritionStore = nutritionTransaction.objectStore("nutrition");
+                                        nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) });
+                                        nutritionStore.put({ name: "totalCarbs", content: Math.round(parseFloat(document.getElementById("total_carbs").innerHTML) * 100) / 100 });
+                                        nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
+                                        nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
 
-                                            document.getElementById("remove_nutrition_name").value = '';
-                                            closeForm(form);
-                                            setNutritionToday();
-                                        }
+                                        document.getElementById("remove_nutrition_name").value = '';
+                                        closeForm(form);
+                                        setNutritionToday();
                                     }
-                                }
+                                };
                             }
-                            if (document.getElementById("remove_nutrition_name").value != '') {
-                                error = document.getElementsByClassName('error');
-                                for (i = 0; i < error.length; i++) {
-                                    error[i].innerHTML = "The food/meal you entered is not in today's nutrition.";
-                                }
-                                return;
-                            }
-                        }
+                        };
+                        break;
                     }
                 }
-                if (removed === false) {
+                if (document.getElementById("remove_nutrition_name").value != '') {
                     error = document.getElementsByClassName('error');
                     for (i = 0; i < error.length; i++) {
                         error[i].innerHTML = "The food/meal you entered is not in today's nutrition.";
                     }
                     return;
-                }
-                else {
-                    document.getElementById("remove_nutrition_name").value = '';
-                    closeForm(form);
                 }
             }
         }

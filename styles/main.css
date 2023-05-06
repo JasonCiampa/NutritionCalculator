@@ -16,6 +16,12 @@ body {
     color: white;
 }
 
+
+#all_main_content {
+    display: flex;
+    justify-content: center;
+}
+
 /* Header Styles */
 
 header {
@@ -73,40 +79,85 @@ nav ul li a:hover {
     color: white;
 }
 
-/* Daily Nutrition Home Page Styles */
-
-#sections {
-    display: flex;
-    justify-content: space-evenly;
-    border-bottom: 3px solid blue;
-}
-
-#introduction, #how_to_use {
-    display: flex;
-    flex-direction: column;
-    max-width: 50%;
-    padding: 1vh;
-    text-align: center;
-    width: 100%
-}
-
-#introduction p, #how_to_use p {
-    padding: 1vh;
-}
-
-#introduction h3, #how_to_use h3 {
-    text-align: center;
-}
-
-main h2 {
-    text-align: center;
-    padding: 2vh;
-}
-
 #show_nav_menu_button {
     display: none;
 }
 
+
+/* Text and Images */
+
+main h2 {
+    padding: 3vh;
+    text-align: center;
+}
+
+main #nutrition {
+    padding: 0 3vh;
+    color: rgb(0, 51, 255);
+}
+
+#nutrition_info {
+    display: flex;
+    padding-bottom: 5vh;
+    border-bottom: 3px solid blue;
+}
+
+#nutrition_info #nutrition_text {
+    width: 70%;
+    text-align: left;
+    padding: 0 3vh;
+}
+
+#nutrition_info img {
+    width: 30%;
+    padding-right: 3vh;
+}
+
+main #calories {
+    padding: 5vh 3vh 0 0;
+    text-align: right;
+    color: rgb(0, 51, 255);
+}
+
+#calories_info {
+    display: flex;
+    flex-direction: row-reverse;
+    padding-bottom: 5vh;
+    border-bottom: 3px solid blue;
+}
+
+#calories_info #calories_text {
+    width: 70%;
+    text-align: right;
+    padding: 0 3vh;
+}
+
+#calories_info img {
+    width: 30%;
+    padding-left: 3vh;
+}
+
+main #micronutrients {
+    padding: 5vh 0 0 3vh;
+    color: rgb(0, 51, 255);
+}
+
+#micronutrients_info {
+    display: flex;
+    padding-bottom: 5vh;
+    border-bottom: 3px solid blue;
+}
+
+#micronutrients_info #micronutrients_text {
+    width: 70%;
+    text-align: left;
+    padding: 0 3vh;
+}
+
+#micronutrients_info img {
+    width: 30%;
+    padding-right: 3vh;
+}
 
 /* Footer Styles */
 
@@ -177,16 +228,28 @@ footer {
         display: block;
     }
 
-    #sections {
+    #nutrition_info, #calories_info, #micronutrients_info {
         flex-direction: column;
-        justify-content: center;
         align-items: center;
     }
 
-    #introduction, #how_to_use {
-        max-width: 90%;
+    #nutrition_info #nutrition_text, #calories_info #calories_text, #micronutrients_info #micronutrients_text {
         text-align: center;
     }
 
+    main #nutrition {
+        text-align: center;
+    }
+
+    main #calories, main #micronutrients {
+        padding: 5vh 0 0 0;
+        text-align: center;
+    }
+
+    #nutrition_info img, #calories_info img, #micronutrients_info img {
+        width: 100%;
+        padding: 3vh 3vh 0 3vh;
+    }
+    
 }
 

@@ -501,12 +501,11 @@ function processForm(form) {
                         nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
                         nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
                         nutritionStore.put({ name: "currentDate", content: String(document.getElementById('current_date').innerHTML) })
-                        
-                        location.reload();
-                        // document.getElementById("log_nutrition_name").value = '';
-                        // document.getElementById("log_nutrition_servings").value = '';
-                        // closeForm(form);
                     };
+                    location.reload();
+                    // document.getElementById("log_nutrition_name").value = '';
+                    // document.getElementById("log_nutrition_servings").value = '';
+                    // closeForm(form);
                 }
                 else {
                     const mealTransaction = db.transaction("meals", "readwrite");
@@ -588,12 +587,11 @@ function processForm(form) {
                                 nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
                                 nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
                                 nutritionStore.put({ name: "currentDate", content: String(document.getElementById('current_date').innerHTML) })
-
-                                location.reload();
-                                // document.getElementById("log_nutrition_name").value = '';
-                                // document.getElementById("log_nutrition_servings").value = '';
-                                // closeForm(form);
                             };
+                            location.reload();
+                            // document.getElementById("log_nutrition_name").value = '';
+                            // document.getElementById("log_nutrition_servings").value = '';
+                            // closeForm(form);
                         }
                         else {
                             error = document.getElementsByClassName('error');
@@ -603,7 +601,7 @@ function processForm(form) {
                             return
                         }
                     };
-                }
+                } ///////
             }
         }
     }

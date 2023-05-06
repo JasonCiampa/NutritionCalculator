@@ -120,6 +120,22 @@ input {
     justify-content: space-evenly;
 }
 
+#cals {
+    color: maroon;
+}
+
+#carbs {
+    color: orange;
+}
+
+#protein {
+    color: rgb(214, 185, 146);
+}
+
+#fat {
+    color: rgb(0, 65, 0);
+}
+
 
 @media screen and (min-width: 280px) and (max-width: 767px) {
     #food_meal_buttons {

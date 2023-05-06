@@ -444,10 +444,6 @@ function processForm(form) {
                 }
 
                 if (foodFound === true) {
-                    error = document.getElementsByClassName('error');
-                    for (i = 0; i < error.length; i++) {
-                        error[i].innerHTML = "What the heck";
-                    }
                 /**
                     * If a food is found:
       
@@ -623,7 +619,6 @@ function processForm(form) {
             const eatenTodayList = nutritionStore.get("eatenToday");
 
             eatenTodayList.onsuccess = function () {
-                removed = false;
                 for (let i = 0; i < eatenTodayList.result.content.length; i++) {
                     if (eatenTodayList.result.content[i].charAt(5) === 'x') {
                         if (eatenTodayList.result.content[i].slice(7, (name.length + 7)) === name) {
@@ -652,10 +647,9 @@ function processForm(form) {
                                     nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
                                     nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
 
-                                    // document.getElementById("remove_nutrition_name").value = '';
-                                    // closeForm(form);
-                                    location.reload();
-                                    removed = true;
+                                    document.getElementById("remove_nutrition_name").value = '';
+                                    closeForm(form);
+                                    setNutritionToday();
                                 }
                                 else {
                                     const mealTransaction = db.transaction("meals", "readwrite");
@@ -664,7 +658,6 @@ function processForm(form) {
         
                                     meal.onsuccess = function () {
                                         if (meal.result != undefined) {
-                                            console.log('hi');
                                             const totalCals = (parseInt(document.getElementById("total_calories").innerHTML) - (meal.result.cals * numServings));
                                             const totalCarbs = Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (meal.result.carbs * numServings)) * 100) / 100;
                                             const totalProtein = Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (meal.result.protein * numServings)) * 100) / 100;
@@ -681,20 +674,19 @@ function processForm(form) {
                                             nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
                                             nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
 
-                                            // document.getElementById("remove_nutrition_name").value = '';
-                                            // closeForm(form);
-                                            location.reload();
-                                            removed = true;
-                                        }
-                                        else {
-                                            error = document.getElementsByClassName('error');
-                                            for (i = 0; i < error.length; i++) {
-                                                error[i].innerHTML = "The food/meal you entered is not in today's nutrition.";
-                                            }
-                                            return;
+                                            document.getElementById("remove_nutrition_name").value = '';
+                                            closeForm(form);
+                                            setNutritionToday();
                                         }
                                     }
                                 }
+                            }
+                            if (document.getElementById("remove_nutrition_name").value != '') {
+                                error = document.getElementsByClassName('error');
+                                for (i = 0; i < error.length; i++) {
+                                    error[i].innerHTML = "The food/meal you entered is not in today's nutrition.";
+                                }
+                                return;
                             }
                         }
                     }

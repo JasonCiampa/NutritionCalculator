@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="stylesheet" href="styles/how_to_use.css">
     <link rel="stylesheet" href="styles/main.css">
 
     <link id="firebase" href="gs://nutrition-calculator-2094f.appspot.com">
@@ -30,60 +31,65 @@
             </ul>
         </nav>
 
-        <h2>Welcome!</h2>
+        <h2>How to Use The Calculator</h2>
 
-        <div id="sections">
-            <section id="how_to_use">
-                <h3>How to Use</h3>
+        <h3 id="foods_and_meals">&quot;Foods and Meals Page&quot;</h3>
+        <div id="foods_and_meals_info">
+            <div id="foods_and_meals_text">
                 <p>
                     The &quot;Foods and Meals&quot; page is where you will be able to manage the foods and meals in your personal registry.
-                    There are four options to choose from on that page.
-                    The first option is to &quot;Add a Food&quot;.
-                    Upon selecting this option, you will be prompted to provide information about the food you wish to add.
-                    This information includes: <br> The name of the food <br> The unit of measurement &#40;ounces, grams, cups, or maybe the food itself, like in the case of an egg&#41; <br>
-                    The serving size &#40;how many of your unit of measurement&#41; <br>
-                    The number of calories in one serving<br>
-                    The number of grams of carbs in one serving <br>
-                    The number of grams of protein in one serving <br>
-                    The number of grams of fat in one serving <br>
+                    There are three options to choose from on that page:
                 </p>
+                <br>
+                <p>
+                    The first option is to &quot;Add/Update a Food&quot;.
+                    Upon selecting this option, you will be prompted to provide information about the food you wish to add.
+                    This information includes: <br> - The name of the food <br> - The unit of measurement &#40;ounces, grams, cups, or maybe the food itself, like in the case of an egg&#41; <br>
+                    - The serving size &#40;how many of your unit of measurement&#41; <br>
+                    - The number of calories in one serving<br>
+                    - The number of grams of carbs in one serving <br>
+                    - The number of grams of protein in one serving <br>
+                    - The number of grams of fat in one serving <br>
+                </p>
+                <br>
                 <p>
                     The second option is to &quot;Add a Meal&quot;, which requires you to enter the name of the ingredient&#40;s&#41; alongside the serving size of the ingredient&#40;s&#41;.
                     Meals can contain any number of ingredients, and you can add more ingredients by clicking the &quot;Add Ingredient&quot; button. 
                     Reversely, you can remove the most recently added ingredient by clicking the &quot;Remove Ingredient&quot; button.
                 </p>
+                <br>
                 <p>
-                    The third option is to &quot;Modify a Food&#47;Meal&quot;, which requires you to enter the name of the food&#47;meal you'd like to make changes to.
-                    Once a name has been entered, a form will appear that looks identical to either the food form or meal form from the previous two options.
-                    You can type in new values and click &quot;Submit&quot; to save them.
-                </p>
-                <p>
-                    The fourth and final option is to &quot;Remove a Food&#47;Meal&quot;, which requires you to enter the name of the food&#47;meal you'd like to remove.
+                    The third and final option is to &quot;Remove a Food&#47;Meal&quot;, which requires you to enter the name of the food&#47;meal you'd like to remove.
                     After that is entered, your selection will be removed from the registry and you won't have to provide any further information.
                 </p>
+            </div>
+
+            <img src="images/foodlog.jpg" alt="">
+        </div>
+
+        <h3 id="todays_nutrition">&quot;Today&apos;s Nutrition&quot;</h3>
+        <div id="todays_nutrition_info">
+            <div id="todays_nutrition_text">
                 <p>
                     The &quot;Today&apos;s Nutrition&quot; page is where you will be able to update and view your calories and macros for the current day.
-                    This page is currently under construction, but upon completion, there will be two options.
-                    One of these options will be to &quot;Add a Food&#47;Meal to Today&apos;s Nutrition&quot;.
-                    When adding a food, you will need to provide the name of the food as well as the number of servings you would like to log.
-                    When adding a meal, you will just need to provide the name of the meal you would like to log.
-                    The other option will be to &quot;Remove a Food&#47;Meal From Today&apos;s Nutrition&quot;.
-                    This option will only require you to provide the name of the food&#47;meal you would like to remove.
-                    Whether adding or removing to the daily nutrition log, the program will automatically update your calories and macros based on the calories and macros of the foods&#47;meals you are adding.
+                    There are two options to choose from on that page:
                 </p>
+                <br>
                 <p>
-                    The &quot;Nutrition Log&quot; page is where you will be able to view a collection of your past daily nutrition logs.
-                    This page serves as a journal of sorts, and allows you to reflect on your calorie and macro intake throughout past days
-                    This page is currently under construction, but upon completion, there will be two options.
-                    One of these options will be to &quot;Search for a Specific Day&apos;s Nutrition Log&quot;, which will allow you to check for a nutrition log of a certain date.
-                    This option will require you to enter the date you would like to search for, and if there is a nutrition log corresponding to your entered date, it will be displayed.
-                    The other option will be to &quot;Modify A Day&apos;s Nutrition&quot;, which will allow you to modify the nutrition log of a certain date.
-                    This option will once again require you to enter the date you would like to find the nutrition log for, and if found, you will be allowed to modify the nutrition log.
-                    The modifications will work similarly to how the &quot;Add a Food&#47;Meal to Today&apos;s Nutrition&quot; and the &quot;Remove a Food&#47;Meal From Today&apos;s Nutrition&quot; options on the &quot;Today&apos;s Nutrition&quot; page functioned.
-                    When modifications are finished, you will be able to click &quot;Submit&quot; to save the changes to the nutrition log.
-                    This can be helpful if you forgot to add a certain food&#47;meal you had eaten the day before.
+                    The first option will be to &quot;Add a Food&#47;Meal to Today&apos;s Nutrition&quot;.
+                    Upon selecting this option, you will be prompted to provide the name and the number of servings for the food/meal you wish to log.
+                    The program will then increment the total calories, carbs, protein, and fat for the day based on your inputted food/meal's nutrition facts (and number of servings).
                 </p>
-            </section>
+                <br>
+                <p>
+                    The second and final option will be to &quot;Remove a Food&#47;Meal From Today&apos;s Nutrition&quot;.
+                    Upon selecting this option, you will be prompted to provide just the name of the food/meal you would like to remove from the log.
+                    The program will then decrement the total calories, carbs, protein, and fat for the day based on your inputted food/meal's nutrition facts (and number of servings that the program detects).
+                    
+                </p>
+            </div>
+
+            <img src="images/weighfood.jpg" alt="">
         </div>
     </main>
 

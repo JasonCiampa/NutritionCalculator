@@ -1,0 +1,79 @@
+/* Text and Images */
+
+main h2 {
+    padding: 3vh;
+    text-align: center;
+}
+
+main #foods_and_meals {
+    padding: 0 3vh;
+    color: rgb(0, 51, 255);
+}
+
+#foods_and_meals_info {
+    display: flex;
+    padding-bottom: 5vh;
+    border-bottom: 3px solid blue;
+}
+
+#foods_and_meals_info #foods_and_meals_text {
+    width: 70%;
+    text-align: left;
+    padding: 0 3vh;
+}
+
+#foods_and_meals_info img {
+    width: 30%;
+    padding-right: 3vh;
+}
+
+main #todays_nutrition {
+    padding: 5vh 3vh 0 0;
+    text-align: right;
+    color: rgb(0, 51, 255);
+}
+
+#todays_nutrition_info {
+    display: flex;
+    flex-direction: row-reverse;
+    padding-bottom: 5vh;
+    border-bottom: 3px solid blue;
+}
+
+#todays_nutrition_info #todays_nutrition_text {
+    width: 70%;
+    text-align: right;
+    padding: 0 3vh;
+}
+
+#todays_nutrition_info img {
+    width: 30%;
+    padding-left: 3vh;
+}
+
+@media screen and (min-width: 280px) and (max-width: 767px) {
+
+    #foods_and_meals_info, #todays_nutrition_info {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #foods_and_meals_info #foods_and_meals_text, #todays_nutrition_info #todays_nutrition_text {
+        text-align: center;
+    }
+
+    main #foods_and_meals {
+        text-align: center;
+    }
+
+    main #todays_nutrition {
+        padding: 5vh 0 0 0;
+        text-align: center;
+    }
+
+    #foods_and_meals_info img, #todays_nutrition_info img {
+        width: 100%;
+        padding: 3vh 3vh 0 3vh;
+    }
+
+}

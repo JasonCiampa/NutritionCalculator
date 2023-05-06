@@ -136,6 +136,14 @@ input {
     color: rgb(0, 65, 0);
 }
 
+#current_date {
+    color: rgb(0, 38, 255);
+}
+
+/* #total_calories, #total_carbs, #total_protein, #total_fat {
+    color: white;
+} */
+
 
 @media screen and (min-width: 280px) and (max-width: 767px) {
     #food_meal_buttons {

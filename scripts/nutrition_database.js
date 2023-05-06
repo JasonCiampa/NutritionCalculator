@@ -506,6 +506,7 @@ function processForm(form) {
                     document.getElementById("log_nutrition_name").value = '';
                     document.getElementById("log_nutrition_servings").value = '';
                     closeForm(form);
+                    setNutritionToday();
                 }
                 else {
                     const mealTransaction = db.transaction("meals", "readwrite");
@@ -592,6 +593,7 @@ function processForm(form) {
                             document.getElementById("log_nutrition_name").value = '';
                             document.getElementById("log_nutrition_servings").value = '';
                             closeForm(form);
+                            setNutritionToday();
                         }
                         else {
                             error = document.getElementsByClassName('error');
@@ -601,7 +603,7 @@ function processForm(form) {
                             return
                         }
                     };
-                } ///////
+                }
             }
         }
     }

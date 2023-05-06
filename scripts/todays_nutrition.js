@@ -4,7 +4,7 @@ function currentDate() {
     document.getElementById('current_date').innerHTML = (String(month[d.getMonth()]) + ' ' + String(d.getDate()) + ',' + ' ' + String(d.getFullYear()));
 }
 
-function setNutritionLists() {
+function setNutritionToday() {
     /**
     
     * This function gathers all of the information for calories, carbs, protein, and fat from the database
@@ -66,5 +66,5 @@ function setNutritionLists() {
 // Calls the function whenever the page loads
 window.addEventListener("load", function() {
     currentDate();
-    setNutritionLists();
+    setNutritionToday();
 });

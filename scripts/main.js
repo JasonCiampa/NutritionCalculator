@@ -3,12 +3,6 @@ function currentYear() {
     document.getElementById('copyright').innerHTML = d.getFullYear();
 }
 
-function currentDate() {
-    let d = new Date();
-    const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    document.getElementById('current_date').innerHTML = (String(month[d.getMonth()]) + ' ' + String(d.getDate()) + ',' + ' ' + String(d.getFullYear()));
-}
-
 window.onload = function() {
     currentYear();
     currentDate();

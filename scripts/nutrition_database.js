@@ -498,9 +498,10 @@ function processForm(form) {
                         nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
                         nutritionStore.put({ name: "currentDate", content: String(document.getElementById('current_date').innerHTML) })
                         
-                        document.getElementById("log_nutrition_name").value = '';
-                        document.getElementById("log_nutrition_servings").value = '';
-                        closeForm(form);
+                        location.reload();
+                        // document.getElementById("log_nutrition_name").value = '';
+                        // document.getElementById("log_nutrition_servings").value = '';
+                        // closeForm(form);
                     };
                 }
                 else {
@@ -584,9 +585,10 @@ function processForm(form) {
                                 nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
                                 nutritionStore.put({ name: "currentDate", content: String(document.getElementById('current_date').innerHTML) })
 
-                                document.getElementById("log_nutrition_name").value = '';
-                                document.getElementById("log_nutrition_servings").value = '';
-                                closeForm(form);
+                                location.reload();
+                                // document.getElementById("log_nutrition_name").value = '';
+                                // document.getElementById("log_nutrition_servings").value = '';
+                                // closeForm(form);
                             };
                         }
                         else {
@@ -646,8 +648,8 @@ function processForm(form) {
                                     nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
                                     nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
 
-                                    document.getElementById("remove_nutrition_name").value = '';
-                                    closeForm(form);
+                                    // document.getElementById("remove_nutrition_name").value = '';
+                                    // closeForm(form);
                                     location.reload();
                                     removed = true;
                                 }
@@ -675,8 +677,8 @@ function processForm(form) {
                                             nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
                                             nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
 
-                                            document.getElementById("remove_nutrition_name").value = '';
-                                            closeForm(form);
+                                            // document.getElementById("remove_nutrition_name").value = '';
+                                            // closeForm(form);
                                             location.reload();
                                             removed = true;
                                         }

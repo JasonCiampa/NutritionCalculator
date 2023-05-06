@@ -444,6 +444,10 @@ function processForm(form) {
                 }
 
                 if (foodFound === true) {
+                    error = document.getElementsByClassName('error');
+                    for (i = 0; i < error.length; i++) {
+                        error[i].innerHTML = "What the heck";
+                    }
                 /**
                     * If a food is found:
       

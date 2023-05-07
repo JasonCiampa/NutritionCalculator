@@ -24,7 +24,7 @@ function setNutritionToday() {
         const currentDate = nutritionStore.get("currentDate");
     
         currentDate.onsuccess = function () {
-            if (currentDate.result.content === document.getElementById('current_date').innerHTML) {
+            if ((currentDate.result != undefined) && (currentDate.result.content === document.getElementById('current_date').innerHTML)) {
                 const totalCals = nutritionStore.get("totalCals");
                 const totalCarbs = nutritionStore.get("totalCarbs");
                 const totalProtein = nutritionStore.get("totalProtein");

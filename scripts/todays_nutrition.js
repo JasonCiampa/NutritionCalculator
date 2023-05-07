@@ -46,7 +46,7 @@ function setNutritionToday() {
                 eatenToday.onsuccess = function () {
                     document.getElementById('eaten_today').innerHTML = '';
                     eatenTodayList = [];
-                    
+
                     for (let i = 0; i < eatenToday.result.content.length; i++){
                         eatenTodayList.push(eatenToday.result.content[i]);
                         document.getElementById('eaten_today').innerHTML += (eatenTodayList[i]) + "<br>";
@@ -55,11 +55,16 @@ function setNutritionToday() {
                 }
             }
             else {
-                document.getElementById('total_calories').innerHTML = 0;
-                document.getElementById('total_carbs').innerHTML = 0;
-                document.getElementById('total_protein').innerHTML = 0;
-                document.getElementById('total_fat').innerHTML = 0;
-                document.getElementById('eaten_today').innerHTML = '';
+                // document.getElementById('total_calories').innerHTML = 0;
+                // document.getElementById('total_carbs').innerHTML = 0;
+                // document.getElementById('total_protein').innerHTML = 0;
+                // document.getElementById('total_fat').innerHTML = 0;
+                // document.getElementById('eaten_today').innerHTML = '';
+                document.getElementById('total_calories').innerHTML = 100;
+                document.getElementById('total_carbs').innerHTML = 100;
+                document.getElementById('total_protein').innerHTML = 100;
+                document.getElementById('total_fat').innerHTML = 100;
+                document.getElementById('eaten_today').innerHTML = 'Fart';
             }
         }
     };

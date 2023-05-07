@@ -24,48 +24,43 @@ function setNutritionToday() {
         const currentDate = nutritionStore.get("currentDate");
     
         currentDate.onsuccess = function () {
-            if ((currentDate.result != undefined) && (currentDate.result.content === document.getElementById('current_date').innerHTML)) {
-                const totalCals = nutritionStore.get("totalCals");
-                const totalCarbs = nutritionStore.get("totalCarbs");
-                const totalProtein = nutritionStore.get("totalProtein");
-                const totalFat = nutritionStore.get("totalFat");
-                const eatenToday = nutritionStore.get("eatenToday");
-            
-                totalCals.onsuccess = function () {
-                    document.getElementById('total_calories').innerHTML = Math.round(totalCals.result.content * 100) / 100;
-                }
-                totalCarbs.onsuccess = function () {
-                    document.getElementById('total_carbs').innerHTML = Math.round(totalCarbs.result.content * 100) / 100;
-                }
-                totalProtein.onsuccess = function () {
-                    document.getElementById('total_protein').innerHTML = Math.round(totalProtein.result.content * 100) / 100;
-                }
-                totalFat.onsuccess = function () {
-                    document.getElementById('total_fat').innerHTML = Math.round(totalFat.result.content * 100) / 100;
-                }
-                eatenToday.onsuccess = function () {
-                    document.getElementById('eaten_today').innerHTML = '';
-                    eatenTodayList = [];
+            // if ((currentDate.result != undefined) && (currentDate.result.content === document.getElementById('current_date').innerHTML)) {
+            const totalCals = nutritionStore.get("totalCals");
+            const totalCarbs = nutritionStore.get("totalCarbs");
+            const totalProtein = nutritionStore.get("totalProtein");
+            const totalFat = nutritionStore.get("totalFat");
+            const eatenToday = nutritionStore.get("eatenToday");
+        
+            totalCals.onsuccess = function () {
+                document.getElementById('total_calories').innerHTML = Math.round(totalCals.result.content * 100) / 100;
+            }
+            totalCarbs.onsuccess = function () {
+                document.getElementById('total_carbs').innerHTML = Math.round(totalCarbs.result.content * 100) / 100;
+            }
+            totalProtein.onsuccess = function () {
+                document.getElementById('total_protein').innerHTML = Math.round(totalProtein.result.content * 100) / 100;
+            }
+            totalFat.onsuccess = function () {
+                document.getElementById('total_fat').innerHTML = Math.round(totalFat.result.content * 100) / 100;
+            }
+            eatenToday.onsuccess = function () {
+                document.getElementById('eaten_today').innerHTML = '';
+                eatenTodayList = [];
 
-                    for (let i = 0; i < eatenToday.result.content.length; i++){
-                        eatenTodayList.push(eatenToday.result.content[i]);
-                        document.getElementById('eaten_today').innerHTML += (eatenTodayList[i]) + "<br>";
-                        // IF WE MAKE EACH ADDITION TO THE INNERHTML A BUTTON RATHER THAN A SINGLE STRING, CAN WE DO THE HOVER/EXPAND FOR NUTRITION INFORMATION?
-                    }
-                }
+            for (let i = 0; i < eatenToday.result.content.length; i++){
+                eatenTodayList.push(eatenToday.result.content[i]);
+                document.getElementById('eaten_today').innerHTML += (eatenTodayList[i]) + "<br>";
+                // IF WE MAKE EACH ADDITION TO THE INNERHTML A BUTTON RATHER THAN A SINGLE STRING, CAN WE DO THE HOVER/EXPAND FOR NUTRITION INFORMATION?
             }
-            else {
-                // document.getElementById('total_calories').innerHTML = 0;
-                // document.getElementById('total_carbs').innerHTML = 0;
-                // document.getElementById('total_protein').innerHTML = 0;
-                // document.getElementById('total_fat').innerHTML = 0;
-                // document.getElementById('eaten_today').innerHTML = '';
-                document.getElementById('total_calories').innerHTML = 100;
-                document.getElementById('total_carbs').innerHTML = 100;
-                document.getElementById('total_protein').innerHTML = 100;
-                document.getElementById('total_fat').innerHTML = 100;
-                document.getElementById('eaten_today').innerHTML = 'Fart';
             }
+            // }
+            // else {
+            //     document.getElementById('total_calories').innerHTML = 0;
+            //     document.getElementById('total_carbs').innerHTML = 0;
+            //     document.getElementById('total_protein').innerHTML = 0;
+            //     document.getElementById('total_fat').innerHTML = 0;
+            //     document.getElementById('eaten_today').innerHTML = '';
+            // }
         }
     };
 }

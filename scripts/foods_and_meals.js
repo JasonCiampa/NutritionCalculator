@@ -23,19 +23,31 @@ function setNutritionLists() {
         
             foodStoreList.onsuccess = function () {
                 document.getElementById('list_of_foods').innerHTML = '';
-        
+                foodList = [];
+
                 for (let i = 0; i < foodStoreList.result.length; i++) {
-                    foodList.push(foodStoreList.result[i].name);
-                    document.getElementById('list_of_foods').innerHTML += (foodList[i]) + "<br>";
+                    foodList.push(foodStoreList.result[i]);
+                    document.getElementById('list_of_foods').innerHTML += (foodList[i].name) + "<br>";
+                    // IF WE MAKE EACH ADDITION TO THE INNERHTML A BUTTON RATHER THAN A SINGLE STRING, CAN WE DO THE HOVER/EXPAND FOR NUTRITION INFORMATION?
                 }
+
+                foodTransaction.oncomplete = function () {
+                    db.close();
+                  };
             };
         
             mealStoreList.onsuccess = function () {
                 document.getElementById('list_of_meals').innerHTML = '';
+                mealList = [];
+
                 for (let i = 0; i < mealStoreList.result.length; i++) {
-                    mealList.push(mealStoreList.result[i].name);
-                    document.getElementById('list_of_meals').innerHTML += (mealList[i]) + "<br>";
+                    mealList.push(mealStoreList.result[i]);
+                    document.getElementById('list_of_meals').innerHTML += (mealList[i].name) + "<br>";
                 }
+
+                mealTransaction.oncomplete = function () {
+                    db.close();
+                };
             };
         };
 }

@@ -71,11 +71,6 @@ class Meal {
 // VARIABLE INITIALIZATION (FORMS, LISTS, BUTTONS)
 let openedFile = '';    /** Initialized as empty, will later be set to whichever form is currently open */
 
-let foodList = [];  /** List of foods used on the Foods and Meals page */
-let mealList = [];  /** List of meals used on the Fodds and Meals page */
-
-// let nutritionLogContent = ''; /** String that will contain the entire daily nutrition log */
-
 const addFoodForm = document.getElementById('add_food_form');   
 const addFoodButton = document.getElementById('add_food');  
 
@@ -244,7 +239,15 @@ function processForm(form) {
             };
         };
 
-        location.reload();
+        document.getElementById("food_name").value = '';
+        document.getElementById("food_measurement_unit").value = '';
+        document.getElementById("food_serving_size").value = '';
+        document.getElementById("food_calories").value = '';
+        document.getElementById("food_carbs").value = '';
+        document.getElementById("food_protein").value = '';
+        document.getElementById("food_fat").value = '';
+        closeForm(form);
+        setNutritionLists();
     }
 
     /**
@@ -270,14 +273,79 @@ function processForm(form) {
         let serving_list = [];
 
         if (name !== '') {
-            for (let i = 0; i < temp_ingredient_list.length; i++) {
-                if ((temp_ingredient_list[i].value !== '') && (temp_serving_list[i].value !== '')){
-                    ingredient_list.push(temp_ingredient_list[i].value);
-                    serving_list.push(temp_serving_list[i].value);
-                }
-                else {
-                    missingInformation();
-                    return
+            const request = openDatabase();
+            request.onsuccess = function () {
+                console.log("Database opened successfully");
+                const db = request.result;
+                const foodTransaction = db.transaction("foods", "readwrite");        
+                const foodStore = foodTransaction.objectStore("foods");
+                const foodList = foodStore.getAll();
+
+                foodList.onsuccess = function () {
+                    for (let i = 0; i < temp_ingredient_list.length; i++) {
+                        if ((temp_ingredient_list[i].value !== '') && (temp_serving_list[i].value !== '')){
+                            let ingredientExists = false;
+                            for (let f = 0; f < foodList.result.length; f++) {
+                                if (foodList.result[f].name === (temp_ingredient_list[i].value)) {
+                                    ingredient_list.push(temp_ingredient_list[i].value);
+                                    serving_list.push(temp_serving_list[i].value);
+                                    ingredientExists = true;
+                                }
+                            }
+                            
+                            if (ingredientExists === false) {
+                                let notRegistered = temp_ingredient_list[i].value;
+                                error = document.getElementsByClassName('error');
+                                for (i = 0; i < error.length; i++) {
+                                    error[i].innerHTML = `${notRegistered} is not registered, and therefore cannot be included in this meal.`;
+                                }
+                                return
+                            }
+                        }
+                        else {
+                            missingInformation();
+                            return
+                        }
+                    }
+
+                    let cals = 0;
+                    let carbs = 0;
+                    let protein = 0;
+                    let fat = 0;
+        
+                    let meal = new Meal(name, ingredient_list, serving_list, cals, carbs, protein, fat);
+        
+                    for (let i = 0; i < ingredient_list.length; i++) {
+                        const food = foodStore.get(ingredient_list[i]);
+                        food.onsuccess = function () {
+        
+                            const mealTransaction = db.transaction("meals", "readwrite");
+                            const mealStore = mealTransaction.objectStore("meals");
+        
+                            cals += parseFloat(food.result.cals) * parseFloat(serving_list[i]);
+                            carbs += parseFloat(food.result.carbs) * parseFloat(serving_list[i]);
+                            protein += parseFloat(food.result.protein) * parseFloat(serving_list[i]);
+                            fat += parseFloat(food.result.fat) * parseFloat(serving_list[i]);
+        
+                            mealStore.put( { name: meal.name, ingredient_list: meal.ingredient_list, serving_list: meal.serving_list, cals: (meal.cals + cals), carbs: (meal.carbs + carbs), protein: (meal.protein + protein), fat: (meal.fat + fat) });
+                            
+                            mealTransaction.oncomplete = function () {
+                                db.close();
+                            };
+                        };
+                    }
+                    
+                    document.getElementById("meal_name").value = '';
+                    for (i = 0; i < temp_ingredient_list.length; i++) {
+                        temp_ingredient_list[i].value = '';
+                        temp_serving_list[i].value = '';
+                    }
+                    closeForm(form);
+                    setNutritionLists();
+        
+                    foodTransaction.oncomplete = function () {
+                        db.close();
+                    }
                 }
             }
         }
@@ -285,45 +353,6 @@ function processForm(form) {
             missingInformation();
             return
         }
-
-        const request = openDatabase();
-        request.onsuccess = function () {
-            let cals = 0;
-            let carbs = 0;
-            let protein = 0;
-            let fat = 0;
-
-            let meal = new Meal(name, ingredient_list, serving_list, cals, carbs, protein, fat);
-
-            console.log("Database opened successfully");
-            const db = request.result;
-            const foodTransaction = db.transaction("foods", "readwrite");        
-            const foodStore = foodTransaction.objectStore("foods");
-            for (let i = 0; i < ingredient_list.length; i++) {
-                const food = foodStore.get(ingredient_list[i]);
-                food.onsuccess = function () {
-                    const mealTransaction = db.transaction("meals", "readwrite");
-                    const mealStore = mealTransaction.objectStore("meals");
-
-                    cals += parseFloat(food.result.cals) * parseFloat(serving_list[i]);
-                    carbs += parseFloat(food.result.carbs) * parseFloat(serving_list[i]);
-                    protein += parseFloat(food.result.protein) * parseFloat(serving_list[i]);
-                    fat += parseFloat(food.result.fat) * parseFloat(serving_list[i]);
-
-                    mealStore.put( {name: meal.name, ingredient_list: meal.ingredient_list, serving_list: meal.serving_list, cals: (meal.cals + cals), carbs: (meal.carbs + carbs), protein: (meal.protein + protein), fat: (meal.fat + fat) });
-                    
-                    mealTransaction.oncomplete = function () {
-                        db.close();
-                    };
-                };
-            }
-
-            foodTransaction.oncomplete = function () {
-                db.close();
-            }
-        };
-
-        location.reload();
     }
 
     /**
@@ -368,7 +397,9 @@ function processForm(form) {
 
                 if (foodFound === true) {
                     const deleteFood = foodStore.delete(name);
-                    location.reload();
+                    document.getElementById('remove_name').value = '';
+                    closeForm(form);
+                    setNutritionLists();
                     return;
                 }
                 else {
@@ -387,7 +418,9 @@ function processForm(form) {
 
                         if (mealFound === true) {
                             const deleteMeal = mealStore.delete(name);
-                            location.reload();
+                            document.getElementById('remove_name').value = '';
+                            closeForm(form);
+                            setNutritionLists();
                         }
                         else {
                             error = document.getElementsByClassName('error');
@@ -465,40 +498,29 @@ function processForm(form) {
                         const nutritionTransaction = db.transaction("nutrition", "readwrite");
                         const nutritionStore = nutritionTransaction.objectStore("nutrition");
 
-                        const eatenTodayList = nutritionStore.get('eatenToday');
-                        eatenTodayList.onsuccess = function () {
-                            if (eatenTodayList.result === undefined){
+                        const eatenToday = nutritionStore.get('eatenToday');
+                        eatenToday.onsuccess = function () {
+                            if (eatenToday.result === undefined){
                                 nutritionStore.put({ name: "eatenToday", content: [`<br>${numServings}x ${foodToLog.result.name} (${foodToLog.result.serving_size} ${foodToLog.result.measurement_unit})<br>Calories: ${parseInt(foodToLog.result.cals * numServings)}<br>Carbs: ${Math.round(parseFloat(foodToLog.result.carbs * numServings) * 100) / 100}<br>Protein: ${Math.round(parseFloat(foodToLog.result.protein * numServings) * 100) / 100}<br>Fat: ${Math.round(parseFloat(foodToLog.result.fat * numServings) * 100) / 100}<br>`]} );
-                                document.getElementById('eaten_today').innerHTML = (`<br>${numServings}x ${foodToLog.result.name} (${foodToLog.result.serving_size} ${foodToLog.result.measurement_unit})<br>Calories: ${parseInt(foodToLog.result.cals * numServings)}<br>Carbs: ${Math.round(parseFloat(foodToLog.result.carbs * numServings) * 100) / 100}<br>Protein: ${Math.round(parseFloat(foodToLog.result.protein * numServings) * 100) / 100}<br>Fat: ${Math.round(parseFloat(foodToLog.result.fat * numServings) * 100) / 100}<br>`);
                             }
                             else {
-                                eatenTodayList.result.content.push(`<br>${numServings}x ${foodToLog.result.name} (${foodToLog.result.serving_size} ${foodToLog.result.measurement_unit})<br>Calories: ${parseInt(foodToLog.result.cals * numServings)}<br>Carbs: ${Math.round(parseFloat(foodToLog.result.carbs * numServings) * 100) / 100}<br>Protein: ${Math.round(parseFloat(foodToLog.result.protein * numServings) * 100) / 100}<br>Fat: ${Math.round(parseFloat(foodToLog.result.fat * numServings) * 100) / 100}<br>`);
-                                nutritionStore.put({ name: "eatenToday", content: eatenTodayList.result.content} );
-                                let currentLog = '';
-                                for (let i = 0; i < eatenTodayList.result.content.length; i++) {
-                                    currentLog += eatenTodayList.result.content[i];
-                                }
-                                document.getElementById('eaten_today').innerHTML = (`${currentLog}`);
+                                eatenToday.result.content.push(`<br>${numServings}x ${foodToLog.result.name} (${foodToLog.result.serving_size} ${foodToLog.result.measurement_unit})<br>Calories: ${parseInt(foodToLog.result.cals * numServings)}<br>Carbs: ${Math.round(parseFloat(foodToLog.result.carbs * numServings) * 100) / 100}<br>Protein: ${Math.round(parseFloat(foodToLog.result.protein * numServings) * 100) / 100}<br>Fat: ${Math.round(parseFloat(foodToLog.result.fat * numServings) * 100) / 100}<br>`);
+                                nutritionStore.put({ name: "eatenToday", content: eatenToday.result.content} );
                             }
                         };
 
                         const totalCals = parseInt(document.getElementById("total_calories").innerHTML);
                         const totalCarbs = parseFloat(document.getElementById("total_carbs").innerHTML);
                         const totalProtein = parseFloat(document.getElementById("total_protein").innerHTML);
-                        const totalFat = parseFloat(document.getElementById("total_fat").innerHTML);
+                        const totalFat = parseFloat(document.getElementById("total_fat").innerHTML);        
 
-                        document.getElementById("total_calories").innerHTML = (`${totalCals + parseInt(foodToLog.result.cals * numServings)}`);
-                        document.getElementById("total_carbs").innerHTML = (`${totalCarbs + Math.round(parseFloat(foodToLog.result.carbs * numServings) * 100) / 100}`);
-                        document.getElementById("total_protein").innerHTML = (`${totalProtein + Math.round(parseFloat(foodToLog.result.protein * numServings) * 100) / 100}`);
-                        document.getElementById("total_fat").innerHTML = (`${totalFat + Math.round(parseFloat(foodToLog.result.fat * numServings) * 100) / 100}`);            
-
-                        nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) });
-                        nutritionStore.put({ name: "totalCarbs", content: Math.round(parseFloat(document.getElementById("total_carbs").innerHTML) * 100) / 100 });
-                        nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
-                        nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
+                        nutritionStore.put({ name: "totalCals", content: totalCals + parseInt(foodToLog.result.cals * numServings) });
+                        nutritionStore.put({ name: "totalCarbs", content: totalCarbs + Math.round(parseFloat(foodToLog.result.carbs * numServings) * 100) / 100 });
+                        nutritionStore.put({ name: "totalProtein", content: totalProtein + Math.round(parseFloat(foodToLog.result.protein * numServings) * 100) / 100 });
+                        nutritionStore.put({ name: "totalFat", content: totalFat + Math.round(parseFloat(foodToLog.result.fat * numServings) * 100) / 100 });
                         nutritionStore.put({ name: "currentDate", content: String(document.getElementById('current_date').innerHTML) })
                     };
-                    // location.reload();
+
                     document.getElementById("log_nutrition_name").value = '';
                     document.getElementById("log_nutrition_servings").value = '';
                     closeForm(form);
@@ -539,8 +561,8 @@ function processForm(form) {
                                 const nutritionTransaction = db.transaction("nutrition", "readwrite");
                                 const nutritionStore = nutritionTransaction.objectStore("nutrition");
 
-                                const eatenTodayList = nutritionStore.get('eatenToday');
-                                eatenTodayList.onsuccess = function () {
+                                const eatenToday = nutritionStore.get('eatenToday');
+                                eatenToday.onsuccess = function () {
 
                                     let mealString = (`<br>${numServings}x ${mealToLog.result.name} (`);
                                     for (let i = 0; i < mealToLog.result.ingredient_list.length; i++) {
@@ -554,18 +576,12 @@ function processForm(form) {
 
                                     mealString += (`<br>Calories: ${parseInt(mealToLog.result.cals * numServings)}<br>Carbs: ${Math.round(parseFloat(mealToLog.result.carbs * numServings) * 100) / 100}<br>Protein: ${Math.round(parseFloat(mealToLog.result.protein * numServings) * 100) / 100}<br>Fat: ${Math.round(parseFloat(mealToLog.result.fat * numServings) * 100) / 100}<br>`);
 
-                                    if (eatenTodayList.result === undefined){
+                                    if (eatenToday.result === undefined){
                                         nutritionStore.put({ name: "eatenToday", content: [mealString] });
-                                        document.getElementById('eaten_today').innerHTML = (mealString);
                                     }
                                     else {
-                                        eatenTodayList.result.content.push(mealString);
-                                        nutritionStore.put({ name: "eatenToday", content: eatenTodayList.result.content} );
-                                        let currentLog = '';
-                                        for (let i = 0; i < eatenTodayList.result.content.length; i++) {
-                                            currentLog += eatenTodayList.result.content[i];
-                                        }
-                                        document.getElementById('eaten_today').innerHTML = (`${currentLog}`);
+                                        eatenToday.result.content.push(mealString);
+                                        nutritionStore.put({ name: "eatenToday", content: eatenToday.result.content} );
                                     }
                                 };
 
@@ -573,19 +589,13 @@ function processForm(form) {
                                 const totalCarbs = parseFloat(document.getElementById("total_carbs").innerHTML);
                                 const totalProtein = parseFloat(document.getElementById("total_protein").innerHTML);
                                 const totalFat = parseFloat(document.getElementById("total_fat").innerHTML);
-
-                                document.getElementById("total_calories").innerHTML = (`${totalCals + parseInt(mealToLog.result.cals * numServings)}`);
-                                document.getElementById("total_carbs").innerHTML = (`${totalCarbs + Math.round(parseFloat(mealToLog.result.carbs * numServings) * 100) / 100}`);
-                                document.getElementById("total_protein").innerHTML = (`${totalProtein + Math.round(parseFloat(mealToLog.result.protein * numServings) * 100) / 100}`);
-                                document.getElementById("total_fat").innerHTML = (`${totalFat + Math.round(parseFloat(mealToLog.result.fat * numServings) * 100) / 100}`);
                                 
-                                nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) });
-                                nutritionStore.put({ name: "totalCarbs", content: Math.round(parseFloat(document.getElementById("total_carbs").innerHTML) * 100) / 100 });
-                                nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
-                                nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
+                                nutritionStore.put({ name: "totalCals", content: totalCals + parseInt(mealToLog.result.cals * numServings) });
+                                nutritionStore.put({ name: "totalCarbs", content: totalCarbs + Math.round(parseFloat(mealToLog.result.carbs * numServings) * 100) / 100 });
+                                nutritionStore.put({ name: "totalProtein", content: totalProtein + Math.round(parseFloat(mealToLog.result.protein * numServings) * 100) / 100 });
+                                nutritionStore.put({ name: "totalFat", content: totalFat + Math.round(parseFloat(mealToLog.result.fat * numServings) * 100) / 100 });
                                 nutritionStore.put({ name: "currentDate", content: String(document.getElementById('current_date').innerHTML) })
                             };
-                            // location.reload();
                             document.getElementById("log_nutrition_name").value = '';
                             document.getElementById("log_nutrition_servings").value = '';
                             closeForm(form);
@@ -616,35 +626,26 @@ function processForm(form) {
             const db = request.result;
             const nutritionTransaction = db.transaction("nutrition", "readwrite");
             const nutritionStore = nutritionTransaction.objectStore("nutrition");
-            const eatenTodayList = nutritionStore.get("eatenToday");
+            const eatenToday = nutritionStore.get("eatenToday");
 
-            eatenTodayList.onsuccess = function () {
-                for (let i = 0; i < eatenTodayList.result.content.length; i++) {
-                    if (eatenTodayList.result.content[i].slice(7, (name.length + 7)) === name) {
-                        let numServings = parseFloat(eatenTodayList.result.content[i].charAt(4));
-                        eatenTodayList.result = eatenTodayList.result.content.splice(i, 1);
-                        nutritionStore.put(eatenTodayList.result);
+            eatenToday.onsuccess = function () {
+                for (let i = 0; i < eatenToday.result.content.length; i++) {
+                    if (eatenToday.result.content[i].slice(7, (name.length + 7)) === name) {
+                        let numServings = parseFloat(eatenToday.result.content[i].charAt(4));
+                        eatenToday.result = eatenToday.result.content.splice(i, 1);
+                        nutritionStore.put(eatenToday.result);
                         const foodTransaction = db.transaction("foods", "readwrite");
                         const foodStore = foodTransaction.objectStore("foods");
                         const food = foodStore.get(name);
 
                         food.onsuccess = function () {
                             if (food.result != undefined) {
-                                const totalCals = (parseInt(document.getElementById("total_calories").innerHTML) - ((food.result.cals) * numServings));
-                                const totalCarbs = Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (parseFloat(food.result.carbs) * numServings)) * 100) / 100;
-                                const totalProtein = Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (parseFloat(food.result.protein) * numServings)) * 100) / 100;
-                                const totalFat = Math.round((parseFloat(document.getElementById("total_fat").innerHTML) - (parseFloat(food.result.fat) * numServings)) * 100) / 100;
-                                document.getElementById("total_calories").innerHTML = totalCals;
-                                document.getElementById("total_carbs").innerHTML = totalCarbs;
-                                document.getElementById("total_protein").innerHTML = totalProtein;
-                                document.getElementById("total_fat").innerHTML = totalFat;
-
                                 const nutritionTransaction = db.transaction("nutrition", "readwrite");
                                 const nutritionStore = nutritionTransaction.objectStore("nutrition");
-                                nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) });
-                                nutritionStore.put({ name: "totalCarbs", content: Math.round(parseFloat(document.getElementById("total_carbs").innerHTML) * 100) / 100 });
-                                nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
-                                nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
+                                nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) - ((food.result.cals) * numServings) });
+                                nutritionStore.put({ name: "totalCarbs", content: Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (parseFloat(food.result.carbs) * numServings)) * 100) / 100 });
+                                nutritionStore.put({ name: "totalProtein", content: Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (parseFloat(food.result.protein) * numServings)) * 100) / 100 });
+                                nutritionStore.put({ name: "totalFat", content: Math.round((parseFloat(document.getElementById("total_fat").innerHTML) - (parseFloat(food.result.fat) * numServings)) * 100) / 100 });
 
                                 document.getElementById("remove_nutrition_name").value = '';
                                 closeForm(form);
@@ -657,21 +658,12 @@ function processForm(form) {
     
                                 meal.onsuccess = function () {
                                     if (meal.result != undefined) {
-                                        const totalCals = (parseInt(document.getElementById("total_calories").innerHTML) - (meal.result.cals * numServings));
-                                        const totalCarbs = Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (meal.result.carbs * numServings)) * 100) / 100;
-                                        const totalProtein = Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (meal.result.protein * numServings)) * 100) / 100;
-                                        const totalFat = Math.round((parseFloat(document.getElementById("total_fat").innerHTML) - (meal.result.fat * numServings)) * 100) / 100;
-                                        document.getElementById("total_calories").innerHTML = totalCals;
-                                        document.getElementById("total_carbs").innerHTML = totalCarbs;
-                                        document.getElementById("total_protein").innerHTML = totalProtein;
-                                        document.getElementById("total_fat").innerHTML = totalFat;
-
                                         const nutritionTransaction = db.transaction("nutrition", "readwrite");
                                         const nutritionStore = nutritionTransaction.objectStore("nutrition");
-                                        nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) });
-                                        nutritionStore.put({ name: "totalCarbs", content: Math.round(parseFloat(document.getElementById("total_carbs").innerHTML) * 100) / 100 });
-                                        nutritionStore.put({ name: "totalProtein", content: Math.round(parseFloat(document.getElementById("total_protein").innerHTML) * 100) / 100 });
-                                        nutritionStore.put({ name: "totalFat", content: Math.round(parseFloat(document.getElementById("total_fat").innerHTML) * 100) / 100 });
+                                        nutritionStore.put({ name: "totalCals", content: parseInt(document.getElementById("total_calories").innerHTML) - (meal.result.cals * numServings) });
+                                        nutritionStore.put({ name: "totalCarbs", content: Math.round((parseFloat(document.getElementById("total_carbs").innerHTML) - (meal.result.carbs * numServings)) * 100) / 100 });
+                                        nutritionStore.put({ name: "totalProtein", content: Math.round((parseFloat(document.getElementById("total_protein").innerHTML) - (meal.result.protein * numServings)) * 100) / 100 });
+                                        nutritionStore.put({ name: "totalFat", content: Math.round((parseFloat(document.getElementById("total_fat").innerHTML) - (meal.result.fat * numServings)) * 100) / 100 });
 
                                         document.getElementById("remove_nutrition_name").value = '';
                                         closeForm(form);

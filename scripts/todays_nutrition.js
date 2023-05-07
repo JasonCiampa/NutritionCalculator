@@ -29,7 +29,7 @@ function setNutritionToday() {
                 const totalCarbs = nutritionStore.get("totalCarbs");
                 const totalProtein = nutritionStore.get("totalProtein");
                 const totalFat = nutritionStore.get("totalFat");
-                const eatenTodayList = nutritionStore.get("eatenToday");
+                const eatenToday = nutritionStore.get("eatenToday");
             
                 totalCals.onsuccess = function () {
                     document.getElementById('total_calories').innerHTML = Math.round(totalCals.result.content * 100) / 100;
@@ -43,15 +43,17 @@ function setNutritionToday() {
                 totalFat.onsuccess = function () {
                     document.getElementById('total_fat').innerHTML = Math.round(totalFat.result.content * 100) / 100;
                 }
-                eatenTodayList.onsuccess = function () {
-                    let currentLog = '';
-                    for (let i = 0; i < eatenTodayList.result.content.length; i++){
-                        currentLog += eatenTodayList.result.content[i];
+                eatenToday.onsuccess = function () {
+                    document.getElementById('eaten_today').innerHTML = '';
+                    eatenTodayList = [];
+                    
+                    for (let i = 0; i < eatenToday.result.content.length; i++){
+                        eatenTodayList.push(eatenToday.result.content[i]);
+                        document.getElementById('eaten_today').innerHTML += (eatenTodayList[i]) + "<br>";
                         // IF WE MAKE EACH ADDITION TO THE INNERHTML A BUTTON RATHER THAN A SINGLE STRING, CAN WE DO THE HOVER/EXPAND FOR NUTRITION INFORMATION?
                     }
-                    document.getElementById('eaten_today').innerHTML = currentLog;
                 }
-                }
+            }
             else {
                 document.getElementById('total_calories').innerHTML = 0;
                 document.getElementById('total_carbs').innerHTML = 0;

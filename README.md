@@ -1,4 +1,3 @@
-# nutrition_calculator
-Nutrition Calculator
+# Nutrition Calculator
 
-https://jasonciampa.github.io/nutrition_calculator/
+https://jasonciampa.github.io/NutritionCalculator/

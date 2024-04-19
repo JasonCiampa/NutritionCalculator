@@ -50,7 +50,7 @@
     background-color: rgb(0, 110, 255);
 }
 
-#nutritionInformation {
+#nutritionInformation, #ingredientsList {
     list-style-type: none;
 }
 

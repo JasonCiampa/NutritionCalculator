@@ -113,6 +113,7 @@ function setNutritionLists() {
                         
                         nutritionViewer.appendChild(document.createElement("h4")).innerHTML = "Ingredients:";                                                               // Create an h4 element, set its text, and store it as a child of the nutritionViewer
                         let ingredientsList = document.createElement("ul");                                                                                                 // Create an unordered list element to store the Meal's ingredients in
+                        ingredientsList.id = "ingredientsList";
 
                         for (let i = 0; i < meal.ingredient_list.length; i++) {                                                                                             // For every ingredient in this meal...
                             ingredientsList.appendChild(document.createElement("li")).innerHTML = meal.serving_list[i] + "x " + meal.ingredient_list[i]                         // Create a list item, set its text to the number of servings, and store it in the ingredientsList

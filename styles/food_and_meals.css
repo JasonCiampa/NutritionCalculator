@@ -1,5 +1,5 @@
-/* Foods and Meals Choices Styles */
-#food_meal_choices {
+/* Foods and Meals Choices Styles AND Food/Meal Buttons Styles */
+#food_meal_choices, #nutritionViewer{
     display: flex;
     flex-direction: column;
     padding: 2vh;
@@ -12,6 +12,7 @@
     padding-bottom: 3vh;
     font-weight: bold;
 }
+
 
 #food_meal_buttons {
     display: flex;
@@ -29,13 +30,28 @@
     transition: 300ms ease;
 }
 
-#food_meal_buttons button:hover {
+#foodButtons button, #mealButtons button {
+    padding: 2vh 7vh 2vh 7vh;
+    border: 3px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 1px solid darkblue;
+    background-color: rgb(0, 86, 198);
+    transition: 300ms ease; 
+}
+
+#food_meal_buttons button:hover, #foodButtons button:hover, #mealButtons button:hover{
     background-color: darkblue;
     cursor: pointer;
 }
 
-#food_meal_buttons button:active {
+#food_meal_buttons button:active, #food_meal_buttons button:active {
     background-color: rgb(0, 110, 255);
+}
+
+#nutritionInformation {
+    list-style-type: none;
 }
 
 /* Food and Meal Forms Styles */

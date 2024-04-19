@@ -29,51 +29,54 @@
             </ul>
         </nav>
 
-        <section id="daily_nutrition_choices">
-            <h3>Select an option:</h3>
-            <div id="daily_nutrition_buttons">
-                <button id="log_nutrition" onclick="displayForm(logNutritionForm)" >Add a Food/Meal to Today's Nutrition</button>
-                <button id="remove_nutrition" onclick="displayForm(removeNutritionForm)" >Remove a Food/Meal from Today's Nutrition</button>
-            </div>
 
-            <div id="nutrition_log_forms">
-                <form id="log_nutrition_form">
-                    <h3>Enter the name and number of servings for the food/meal you would like to log in today's nutrition:</h3>
-                    <h4><span class="error"></span></h4>
-                    <div id="name_and_servings">
-                        <p>Name: <input type="text" id="log_nutrition_name" autocomplete="off"></p>
-                        <p>Servings: <input type="text" id="log_nutrition_servings" autocomplete="off"></p>
-                    </div>
 
-                    <div id="log_nutrition_bottom_buttons">
-                        <button class="submit" type="button" onclick="processForm(logNutritionForm)">Submit</button>
-                        <button class="quit" type="reset" onclick="closeForm(logNutritionForm)">Quit</button>
-                    </div>
-                </form>
 
-                <form id="remove_nutrition_form">
-                    <h3>Enter the name of the food/meal you would like to remove from today's nutrition:</h3>
-                    <h4><span class="error"></span></h4>
-                    <p>Name: <input type="text" id="remove_nutrition_name" autocomplete="off"></p>
 
-                    <div id="remove_nutrition_bottom_buttons">
-                        <button class="submit" type="button" onclick="processForm(removeNutritionForm)">Submit</button>
-                        <button class="quit" type="reset" onclick="closeForm(removeNutritionForm)">Quit</button>
-                    </div>
-                </form>
-            </div>
-        </section>
 
         <section id="daily_nutrition_log">
            <h2><span id="current_date"></span></h2>
+
+        <form id="log_nutrition_form">
+            <h3>Enter the number of servings for the food/meal you would like to log in today's nutrition:</h3>
+            <h4><span class="error"></span></h4>
+            <div id="name_and_servings">
+                <input type="text" id="log_nutrition_name" autocomplete="off"> <br>
+                <input type="text" id="remove_nutrition_name" autocomplete="off">
+
+                <p>Servings: <br> <input type="text" id="log_nutrition_servings" autocomplete="off"></p> <br>
+            </div>
+
+            <div id="log_nutrition_bottom_buttons">
+                <button class="submit" type="button" onclick="processForm(logNutritionForm)">Submit</button>
+                <button class="quit" type="reset" onclick="closeForm(logNutritionForm)">Quit</button>
+            </div>
+        </form>
+
+
+
            <div id="macros">
             <h2 id="cals">Calories: <span id="total_calories">0</span></h2>
             <h2 id="carbs">Carbs: <span id="total_carbs">0</span>g</h2>
             <h2 id="protein">Protein: <span id="total_protein">0</span>g</h2>
             <h2 id="fat">Fat: <span id="total_fat">0</span>g</h2>
            </div>
-           <p><span id="eaten_today"></span></p>
+           <span id="eaten_today"></span>
         </section>
+
+
+        <div id="food_and_meal_lists">
+            <section id="food_list">
+                <h3>Foods:</h3>
+                <span id="list_of_foods"></span>
+            </section>
+    
+            <section id="meal_list">
+                <h3>Meals:</h3>
+                <span id="list_of_meals"></span>
+            </section>
+        </div>
+
     </main>
 
     <footer>

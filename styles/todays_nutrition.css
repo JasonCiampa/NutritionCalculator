@@ -18,8 +18,8 @@
     justify-content: space-evenly;
 }
 
-#daily_nutrition_buttons button {
-    padding: 3vh;
+#daily_nutrition_buttons button, #log_nutrition_form button, #eaten_today button {
+    padding: 2vh;
     border: 3px solid darkblue;
     color: white;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -29,7 +29,14 @@
     transition: 300ms ease;
 }
 
-#daily_nutrition_buttons button:hover {
+#eaten_today button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+#daily_nutrition_buttons button:hover, #log_nutrition_form button:hover, #eaten_today button:hover, #foodButtons button:hover, #mealButtons button:hover {
     background-color: darkblue;
     cursor: pointer;
 }
@@ -45,9 +52,10 @@
     justify-content: center;
     padding-top: 5vh;
     margin: auto;
+    text-align: center;
 }
 
-#nutrition_log_forms #log_nutrition_form {
+#log_nutrition_form {
     display: none;
     flex-direction: column;
     width: 100%;
@@ -59,12 +67,21 @@
     border: 3px solid darkblue;
     background-color: rgb(0, 110, 255);
     transition: 300ms ease;
+    justify-content: center;
+    padding-top: 5vh;
+    margin: auto;
+    text-align: center;
 }
 
 #nutrition_log_forms p {
     display: flex;
     flex-direction: column;
     padding: 1.5vh 0;
+}
+
+
+#log_nutrition_name, #remove_nutrition_name{
+    display: none;
 }
 
 input {
@@ -113,6 +130,7 @@ input {
     text-align: left;
     justify-content: center;
     align-items: center;
+    border-bottom: 3px solid blue;
 }
 
 #daily_nutrition_log #macros {
@@ -171,4 +189,39 @@ input {
         justify-content: space-evenly;
         align-items: center;
     }
+}
+
+/* Food and Meal Lists */
+#food_and_meal_lists {
+    display: flex;
+    justify-content: space-evenly;
+    border-bottom: 3px solid blue;
+}
+
+#food_list, #meal_list {
+    display: flex;
+    flex-direction: column;
+    max-width: 50%;
+    padding: 1vh;
+    text-align: center;
+    width: 100%
+}
+
+#food_list p, #meal_list p {
+    padding: 1vh;
+}
+
+#food_list, #meal_list {
+    text-align: center;
+}
+
+#foodButtons button, #mealButtons button {
+    padding: 2vh 7vh 2vh 7vh;
+    border: 3px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 1px solid darkblue;
+    background-color: rgb(0, 86, 198);
+    transition: 300ms ease; 
 }

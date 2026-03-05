@@ -81,6 +81,7 @@ const modifyForm = document.getElementById('modify_form');
 const modifyButton = document.getElementById('modify');
 
 const autoAddFoodForm = document.getElementById('auto_add_food_form');
+const autoAddFoodDiv = autoAddFoodForm;
 
 const logNutritionForm = document.getElementById('log_nutrition_form');
 const logNutritionButton = document.getElementById('log_nutrition');
@@ -125,6 +126,9 @@ function closeForm(form) {
     error = document.getElementsByClassName('error');
     for (i = 0; i < error.length; i++) {
         error[i].innerHTML = '';
+    }
+    if (form.id === 'auto_add_food_form' && typeof resetAutoAddState === 'function') {
+        resetAutoAddState();
     }
     if (typeof editingItem !== 'undefined' && editingItem) {
         editingItem = null;
@@ -191,8 +195,8 @@ function addIngredient() {
     let servings_input = document.createElement("input");
     servings_input.type = "number";
     servings_input.className = "meal_serving_sizes";
-    servings_input.min = "1";
-    servings_input.step = "1";
+    servings_input.min = "0.01";
+    servings_input.step = "any";
     servings_input.value = "1";
     servings_input.autocomplete = "off";
     p_servings.appendChild(servings_text);
@@ -265,29 +269,82 @@ function processForm(form) {
             const db = request.result;
 
             if (isEditing) {
-                const foodTransaction = db.transaction("foods", "readwrite");
-                const foodStore = foodTransaction.objectStore("foods");
-                foodStore.put({ name: food.name, measurement_unit: food.measurement_unit, serving_size: food.serving_size, cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat });
+                var oldName = editingItem.originalName;
+                var nameChanged = (food.name !== oldName);
 
-                foodTransaction.oncomplete = function () {
-                    if (typeof viewedItems !== 'undefined' && viewedItems.has("food:" + food.name)) {
-                        viewedItems.set("food:" + food.name, {
-                            name: food.name, type: "food",
-                            serving_size: food.serving_size, measurement_unit: food.measurement_unit,
-                            cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat
-                        });
+                function commitFoodEdit() {
+                    var foodTransaction = db.transaction("foods", "readwrite");
+                    var foodStore = foodTransaction.objectStore("foods");
+                    if (nameChanged) {
+                        foodStore.delete(oldName);
                     }
-                    cascadeFoodEditToMeals(food.name, db, function (affectedMealNames) {
-                        let allAffected = [food.name].concat(affectedMealNames);
-                        updateTodaysNutritionAfterEdit(allAffected, db, function () {
-                            renderNutritionViewer();
-                            loadCachedFoods(function () {
-                                setNutritionLists();
-                                populateAllIngredientDropdowns();
+                    foodStore.put({ name: food.name, measurement_unit: food.measurement_unit, serving_size: food.serving_size, cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat });
+
+                    foodTransaction.oncomplete = function () {
+                        if (typeof viewedItems !== 'undefined') {
+                            if (nameChanged && viewedItems.has("food:" + oldName)) {
+                                viewedItems.delete("food:" + oldName);
+                            }
+                            viewedItems.set("food:" + food.name, {
+                                name: food.name, type: "food",
+                                serving_size: food.serving_size, measurement_unit: food.measurement_unit,
+                                cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat
                             });
-                        });
-                    });
-                };
+                        }
+
+                        if (nameChanged) {
+                            renameFoodInMeals(oldName, food.name, db, function () {
+                                renameFoodInTodaysNutrition(oldName, food.name, db, function () {
+                                    cascadeFoodEditToMeals(food.name, db, function (affectedMealNames) {
+                                        var allAffected = [food.name].concat(affectedMealNames);
+                                        updateTodaysNutritionAfterEdit(allAffected, db, function () {
+                                            renderNutritionViewer();
+                                            loadCachedFoods(function () {
+                                                setNutritionLists();
+                                                populateAllIngredientDropdowns();
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        } else {
+                            cascadeFoodEditToMeals(food.name, db, function (affectedMealNames) {
+                                var allAffected = [food.name].concat(affectedMealNames);
+                                updateTodaysNutritionAfterEdit(allAffected, db, function () {
+                                    renderNutritionViewer();
+                                    loadCachedFoods(function () {
+                                        setNutritionLists();
+                                        populateAllIngredientDropdowns();
+                                    });
+                                });
+                            });
+                        }
+                    };
+                }
+
+                if (nameChanged) {
+                    var checkTransaction = db.transaction(["foods", "meals"], "readonly");
+                    var cFoodStore = checkTransaction.objectStore("foods");
+                    var cMealStore = checkTransaction.objectStore("meals");
+                    var foodCheck = cFoodStore.get(food.name);
+                    var mealCheck = cMealStore.get(food.name);
+                    var nameExists = false;
+                    foodCheck.onsuccess = function () { if (foodCheck.result) nameExists = true; };
+                    mealCheck.onsuccess = function () { if (mealCheck.result) nameExists = true; };
+                    checkTransaction.oncomplete = function () {
+                        if (nameExists) {
+                            var error = document.getElementsByClassName('error');
+                            for (var i = 0; i < error.length; i++) {
+                                error[i].innerHTML = "A food or meal with this name already exists.";
+                            }
+                            db.close();
+                            return;
+                        }
+                        commitFoodEdit();
+                    };
+                } else {
+                    commitFoodEdit();
+                }
 
                 document.getElementById("food_name").value = '';
                 document.getElementById("food_measurement_unit").value = '';
@@ -448,9 +505,15 @@ function processForm(form) {
 
                             ingredientsDone++;
                             if (ingredientsDone === ingredient_list.length) {
+                                var mealOldName = isEditing ? editingItem.originalName : null;
+                                var mealNameChanged = isEditing && (name !== mealOldName);
+
                                 const mealTransaction = db.transaction("meals", "readwrite");
                                 const mealStore = mealTransaction.objectStore("meals");
 
+                                if (mealNameChanged) {
+                                    mealStore.delete(mealOldName);
+                                }
                                 mealStore.put({
                                     name: name,
                                     ingredient_list: ingredient_list,
@@ -463,7 +526,10 @@ function processForm(form) {
 
                                 mealTransaction.oncomplete = function () {
                                     if (isEditing) {
-                                        if (typeof viewedItems !== 'undefined' && viewedItems.has("meal:" + name)) {
+                                        if (typeof viewedItems !== 'undefined') {
+                                            if (mealNameChanged && viewedItems.has("meal:" + mealOldName)) {
+                                                viewedItems.delete("meal:" + mealOldName);
+                                            }
                                             viewedItems.set("meal:" + name, {
                                                 name: name, type: "meal",
                                                 ingredient_list: ingredient_list,
@@ -474,13 +540,26 @@ function processForm(form) {
                                                 fat: Math.round(totalFat * 100) / 100
                                             });
                                         }
-                                        updateTodaysNutritionAfterEdit([name], db, function () {
-                                            renderNutritionViewer();
-                                            loadCachedFoods(function () {
-                                                setNutritionLists();
-                                                populateAllIngredientDropdowns();
+
+                                        if (mealNameChanged) {
+                                            renameMealInTodaysNutrition(mealOldName, name, db, function () {
+                                                updateTodaysNutritionAfterEdit([name], db, function () {
+                                                    renderNutritionViewer();
+                                                    loadCachedFoods(function () {
+                                                        setNutritionLists();
+                                                        populateAllIngredientDropdowns();
+                                                    });
+                                                });
                                             });
-                                        });
+                                        } else {
+                                            updateTodaysNutritionAfterEdit([name], db, function () {
+                                                renderNutritionViewer();
+                                                loadCachedFoods(function () {
+                                                    setNutritionLists();
+                                                    populateAllIngredientDropdowns();
+                                                });
+                                            });
+                                        }
                                     } else {
                                         db.close();
                                         if (typeof loadCachedFoods === 'function') {
@@ -506,7 +585,9 @@ function processForm(form) {
                 };
             }
 
-            if (!isEditing) {
+            var mealNeedsNameCheck = !isEditing || (isEditing && name !== editingItem.originalName);
+
+            if (mealNeedsNameCheck) {
                 const checkTransaction = db.transaction(["foods", "meals"], "readonly");
                 const cFoodStore = checkTransaction.objectStore("foods");
                 const cMealStore = checkTransaction.objectStore("meals");
@@ -618,15 +699,15 @@ function processForm(form) {
                             }
                         };
 
-                        const totalCals = parseInt(document.getElementById("total_calories").innerHTML);
+                        const totalCals = parseFloat(document.getElementById("total_calories").innerHTML);
                         const totalCarbs = parseFloat(document.getElementById("total_carbs").innerHTML);
                         const totalProtein = parseFloat(document.getElementById("total_protein").innerHTML);
                         const totalFat = parseFloat(document.getElementById("total_fat").innerHTML);        
 
-                        nutritionStore.put({ name: "totalCals", content: totalCals + parseInt(foodToLog.result.cals * numServings) });
-                        nutritionStore.put({ name: "totalCarbs", content: totalCarbs + Math.round(parseFloat(foodToLog.result.carbs * numServings) * 100) / 100 });
-                        nutritionStore.put({ name: "totalProtein", content: totalProtein + Math.round(parseFloat(foodToLog.result.protein * numServings) * 100) / 100 });
-                        nutritionStore.put({ name: "totalFat", content: totalFat + Math.round(parseFloat(foodToLog.result.fat * numServings) * 100) / 100 });
+                        nutritionStore.put({ name: "totalCals", content: Math.round((totalCals + parseFloat(foodToLog.result.cals) * numServings) * 100) / 100 });
+                        nutritionStore.put({ name: "totalCarbs", content: Math.round((totalCarbs + parseFloat(foodToLog.result.carbs) * numServings) * 100) / 100 });
+                        nutritionStore.put({ name: "totalProtein", content: Math.round((totalProtein + parseFloat(foodToLog.result.protein) * numServings) * 100) / 100 });
+                        nutritionStore.put({ name: "totalFat", content: Math.round((totalFat + parseFloat(foodToLog.result.fat) * numServings) * 100) / 100 });
                         nutritionStore.put({ name: "currentDate", content: String(document.getElementById('current_date').innerHTML) })
 
                         nutritionTransaction.oncomplete = function () {
@@ -699,15 +780,15 @@ function processForm(form) {
                                     }
                                 };
 
-                                const totalCals = parseInt(document.getElementById("total_calories").innerHTML);
+                                const totalCals = parseFloat(document.getElementById("total_calories").innerHTML);
                                 const totalCarbs = parseFloat(document.getElementById("total_carbs").innerHTML);
                                 const totalProtein = parseFloat(document.getElementById("total_protein").innerHTML);
                                 const totalFat = parseFloat(document.getElementById("total_fat").innerHTML);
                                 
-                                nutritionStore.put({ name: "totalCals", content: totalCals + parseInt(mealToLog.result.cals * numServings) });
-                                nutritionStore.put({ name: "totalCarbs", content: totalCarbs + Math.round(parseFloat(mealToLog.result.carbs * numServings) * 100) / 100 });
-                                nutritionStore.put({ name: "totalProtein", content: totalProtein + Math.round(parseFloat(mealToLog.result.protein * numServings) * 100) / 100 });
-                                nutritionStore.put({ name: "totalFat", content: totalFat + Math.round(parseFloat(mealToLog.result.fat * numServings) * 100) / 100 });
+                                nutritionStore.put({ name: "totalCals", content: Math.round((totalCals + parseFloat(mealToLog.result.cals) * numServings) * 100) / 100 });
+                                nutritionStore.put({ name: "totalCarbs", content: Math.round((totalCarbs + parseFloat(mealToLog.result.carbs) * numServings) * 100) / 100 });
+                                nutritionStore.put({ name: "totalProtein", content: Math.round((totalProtein + parseFloat(mealToLog.result.protein) * numServings) * 100) / 100 });
+                                nutritionStore.put({ name: "totalFat", content: Math.round((totalFat + parseFloat(mealToLog.result.fat) * numServings) * 100) / 100 });
                                 nutritionStore.put({ name: "currentDate", content: String(document.getElementById('current_date').innerHTML) })
 
                                 nutritionTransaction.oncomplete = function () {

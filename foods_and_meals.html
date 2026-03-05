@@ -50,11 +50,11 @@
                     <h4><span class="error"></span></h4>
                     <p>Name: <input type="text" id="food_name" autocomplete="off"></p>
                     <p>Unit of Measurement: <input type="text" id="food_measurement_unit" autocomplete="off"></p>
-                    <p>Serving Size: <input type="text" id="food_serving_size" autocomplete="off"></p>
-                    <p>Calories: <input type="text" id="food_calories" autocomplete="off"></p>
-                    <p>Fat (in grams): <input type="text" id="food_fat" autocomplete="off"></p>
-                    <p>Carbs (in grams): <input type="text" id="food_carbs" autocomplete="off"></p>
-                    <p>Protein (in grams): <input type="text" id="food_protein" autocomplete="off"></p>
+                    <p>Serving Size: <input type="number" id="food_serving_size" step="any" min="0" autocomplete="off"></p>
+                    <p>Calories: <input type="number" id="food_calories" step="any" min="0" autocomplete="off"></p>
+                    <p>Fat (in grams): <input type="number" id="food_fat" step="any" min="0" autocomplete="off"></p>
+                    <p>Carbs (in grams): <input type="number" id="food_carbs" step="any" min="0" autocomplete="off"></p>
+                    <p>Protein (in grams): <input type="number" id="food_protein" step="any" min="0" autocomplete="off"></p>
 
                     <div id="add_food_bottom_buttons">
                         <button class="submit" type="button" onclick="processForm(addFoodForm)">Submit</button>
@@ -62,16 +62,58 @@
                     </div>
                 </form>
 
-                <form id="auto_add_food_form" style="display:none;">
-                    <h3>Enter the name of the food you would like to add:</h3>
+                <div id="auto_add_food_form" style="display:none;">
+                    <h3>Search for a food to auto-add:</h3>
                     <h4><span class="error"></span></h4>
-                    <p>Name: <input type="text" id="auto_food_name" autocomplete="off"></p>
+
+                    <div id="auto_add_tabs">
+                        <button type="button" class="auto-tab active" data-tab="branded">Branded Foods</button>
+                        <button type="button" class="auto-tab" data-tab="restaurant">Restaurant / Fast Food</button>
+                        <button type="button" class="auto-tab" data-tab="general">General Foods</button>
+                    </div>
+
+                    <div id="auto_tab_branded" class="auto-tab-content active">
+                        <div class="auto-field">
+                            <label>Brand Owner:</label>
+                            <input type="text" id="brand_owner_search" autocomplete="off" placeholder="Type to search brands...">
+                            <div id="brand_owner_dropdown" class="auto-dropdown"></div>
+                        </div>
+                        <div class="auto-field" id="branded_food_field" style="display:none;">
+                            <label>Food Name:</label>
+                            <input type="text" id="branded_food_search" autocomplete="off" placeholder="Type to search foods...">
+                            <div id="branded_food_dropdown" class="auto-dropdown"></div>
+                        </div>
+                    </div>
+
+                    <div id="auto_tab_restaurant" class="auto-tab-content">
+                        <div class="auto-field">
+                            <label>Search Restaurant / Fast Food:</label>
+                            <input type="text" id="restaurant_food_search" autocomplete="off" placeholder="Type a restaurant or food name...">
+                            <div id="restaurant_food_dropdown" class="auto-dropdown"></div>
+                        </div>
+                    </div>
+
+                    <div id="auto_tab_general" class="auto-tab-content">
+                        <div class="auto-field">
+                            <label>Search General Foods:</label>
+                            <input type="text" id="general_food_search" autocomplete="off" placeholder="Type a food name...">
+                            <div id="general_food_dropdown" class="auto-dropdown"></div>
+                        </div>
+                    </div>
+
+                    <div id="auto_add_portion_picker" style="display:none;">
+                        <label>Select a portion size:</label>
+                        <div id="portion_options"></div>
+                    </div>
+
+                    <div id="auto_add_loading" style="display:none;">
+                        <p class="loading-text">Loading...</p>
+                    </div>
 
                     <div id="auto_add_food_bottom_buttons">
-                        <button class="submit" type="button">Submit</button>
-                        <button class="quit" type="button" onclick="closeForm(autoAddFoodForm)">Quit</button>
+                        <button class="quit" type="button" onclick="closeAutoAddForm()">Quit</button>
                     </div>
-                </form>
+                </div>
 
                 <form id="add_meal_form">
                     <h3>Provide the following data for your meal to add it to the registry:</h3>
@@ -83,7 +125,7 @@
                                 <input type="text" class="meal_ingredients" autocomplete="off" oninput="filterIngredientDropdown(this)">
                                 <div class="ingredient-dropdown"></div>
                             </div>
-                            <p>Servings: <input type="number" class="meal_serving_sizes" min="1" step="1" value="1" autocomplete="off"></p>
+                            <p>Servings: <input type="number" class="meal_serving_sizes" min="0.01" step="any" value="1" autocomplete="off"></p>
                         </div>
                     </div>
 
@@ -128,6 +170,11 @@
         <p>&copy; <span id="copyright"></span> Jason Ciampa</p>
     </footer>
 
+    <script src="data/brand_owners.js"></script>
+    <script src="data/restaurant_foods.js"></script>
+    <script src="data/general_foods.js"></script>
+    <script src="scripts/usda_api.js"></script>
+    <script src="scripts/auto_add.js"></script>
     <script src="scripts/foods_and_meals.js"></script>
     <script src="scripts/nutrition_database.js"></script>
     <script src="scripts/main.js"></script>

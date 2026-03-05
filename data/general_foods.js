@@ -1,0 +1,1 @@
+const GENERAL_FOODS = [];

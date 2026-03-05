@@ -89,7 +89,6 @@ function editFood(data) {
     displayForm(addFoodForm);
     editingItem = { type: 'food', originalName: data.name };
     document.getElementById('food_name').value = data.name;
-    document.getElementById('food_name').readOnly = true;
     document.getElementById('food_measurement_unit').value = data.measurement_unit;
     document.getElementById('food_serving_size').value = data.serving_size;
     document.getElementById('food_calories').value = data.cals;
@@ -102,7 +101,6 @@ function editMeal(data) {
     displayForm(addMealForm);
     editingItem = { type: 'meal', originalName: data.name };
     document.getElementById('meal_name').value = data.name;
-    document.getElementById('meal_name').readOnly = true;
 
     const ingredientsDiv = document.getElementById('ingredients');
     const existingRows = ingredientsDiv.getElementsByClassName('ingredient_and_serving');
@@ -439,6 +437,86 @@ function removeFromTodaysNutrition(namesToRemove, db) {
     }
 }
 
+function renameFoodInMeals(oldName, newName, db, onComplete) {
+    var mealTransaction = db.transaction("meals", "readwrite");
+    var mealStore = mealTransaction.objectStore("meals");
+    var allMeals = mealStore.getAll();
+
+    allMeals.onsuccess = function () {
+        for (var m = 0; m < allMeals.result.length; m++) {
+            var meal = allMeals.result[m];
+            var idx = meal.ingredient_list.indexOf(oldName);
+            if (idx === -1) continue;
+
+            while (idx !== -1) {
+                meal.ingredient_list[idx] = newName;
+                idx = meal.ingredient_list.indexOf(oldName);
+            }
+            mealStore.put(meal);
+
+            if (typeof viewedItems !== 'undefined' && viewedItems.has("meal:" + meal.name)) {
+                var viewed = viewedItems.get("meal:" + meal.name);
+                viewed.ingredient_list = meal.ingredient_list;
+                viewedItems.set("meal:" + meal.name, viewed);
+            }
+        }
+    };
+
+    mealTransaction.oncomplete = function () {
+        if (onComplete) onComplete();
+    };
+}
+
+function renameFoodInTodaysNutrition(oldName, newName, db, onComplete) {
+    var nutritionTransaction = db.transaction("nutrition", "readwrite");
+    var nutritionStore = nutritionTransaction.objectStore("nutrition");
+    var eatenTodayReq = nutritionStore.get("eatenToday");
+
+    eatenTodayReq.onsuccess = function () {
+        if (!eatenTodayReq.result || !eatenTodayReq.result.content) return;
+        var entries = eatenTodayReq.result.content;
+        var changed = false;
+        for (var i = 0; i < entries.length; i++) {
+            if (entries[i].name === oldName) {
+                entries[i].name = newName;
+                changed = true;
+            }
+        }
+        if (changed) {
+            nutritionStore.put({ name: "eatenToday", content: entries });
+        }
+    };
+
+    nutritionTransaction.oncomplete = function () {
+        if (onComplete) onComplete();
+    };
+}
+
+function renameMealInTodaysNutrition(oldName, newName, db, onComplete) {
+    var nutritionTransaction = db.transaction("nutrition", "readwrite");
+    var nutritionStore = nutritionTransaction.objectStore("nutrition");
+    var eatenTodayReq = nutritionStore.get("eatenToday");
+
+    eatenTodayReq.onsuccess = function () {
+        if (!eatenTodayReq.result || !eatenTodayReq.result.content) return;
+        var entries = eatenTodayReq.result.content;
+        var changed = false;
+        for (var i = 0; i < entries.length; i++) {
+            if (entries[i].name === oldName && entries[i].type === "meal") {
+                entries[i].name = newName;
+                changed = true;
+            }
+        }
+        if (changed) {
+            nutritionStore.put({ name: "eatenToday", content: entries });
+        }
+    };
+
+    nutritionTransaction.oncomplete = function () {
+        if (onComplete) onComplete();
+    };
+}
+
 function cascadeFoodEditToMeals(foodName, db, onComplete) {
     const mealTransaction = db.transaction(["meals", "foods"], "readwrite");
     const mealStore = mealTransaction.objectStore("meals");
@@ -712,11 +790,16 @@ window.addEventListener("load", function () {
 
     document.getElementById('auto_add_btn').addEventListener("click", function () {
         document.getElementById('add_food_choice').style.display = 'none';
-        displayForm(autoAddFoodForm);
+        var autoForm = document.getElementById('auto_add_food_form');
+        displayForm(autoForm);
     });
 
     document.getElementById('add_food_choice_quit').addEventListener("click", function () {
         document.getElementById('add_food_choice').style.display = 'none';
         openedFile = '';
     });
+
+    if (typeof initAutoAdd === "function") {
+        initAutoAdd();
+    }
 });

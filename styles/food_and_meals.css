@@ -102,12 +102,25 @@
     margin: auto;
 }
 
-#food_meal_forms #add_food_form, #food_meal_forms #auto_add_food_form {
+#food_meal_forms #add_food_form {
     display: none;
     flex-direction: column;
     width: 100%;
     padding: 3vh;
     border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 3px solid darkblue;
+    background-color: rgb(0, 110, 255);
+    transition: 300ms ease;
+}
+
+#food_meal_forms #auto_add_food_form {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    padding: 3vh;
     color: white;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
@@ -441,6 +454,179 @@ input {
     text-align: center;
 }
 
+/* Auto-Add Tabs */
+#auto_add_tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 2vh;
+}
+
+.auto-tab {
+    padding: 1.2vh 2vh;
+    border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    background-color: rgb(0, 55, 255);
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+.auto-tab:first-child {
+    border-radius: 5px 0 0 5px;
+}
+
+.auto-tab:last-child {
+    border-radius: 0 5px 5px 0;
+}
+
+.auto-tab:hover {
+    background-color: darkblue;
+}
+
+.auto-tab.active {
+    background-color: darkblue;
+    font-weight: bold;
+}
+
+/* Auto-Add Tab Content */
+.auto-tab-content {
+    display: none;
+}
+
+.auto-tab-content.active {
+    display: block;
+}
+
+/* Auto-Add Fields */
+.auto-field {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5vh;
+}
+
+.auto-field label {
+    margin-bottom: 0.5vh;
+    font-weight: bold;
+}
+
+.auto-field input {
+    padding: 0.8vh 1vh;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 2px solid darkblue;
+    border-radius: 3px;
+}
+
+/* Auto-Add Dropdowns */
+.auto-dropdown {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid darkblue;
+    border-radius: 0 0 3px 3px;
+    margin-top: 0;
+}
+
+.auto-dropdown:empty {
+    display: none;
+}
+
+.auto-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.8vh 1vh;
+    border: none;
+    background: white;
+    color: black;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 200ms ease;
+    border-bottom: 1px solid #eee;
+}
+
+.auto-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.auto-dropdown-item:hover {
+    background-color: rgb(0, 86, 198);
+    color: white;
+}
+
+.auto-dropdown-item.no-results {
+    color: #888;
+    cursor: default;
+    font-style: italic;
+}
+
+.auto-dropdown-item.no-results:hover {
+    background: white;
+    color: #888;
+}
+
+/* Portion Picker */
+#auto_add_portion_picker {
+    margin: 1.5vh 0;
+    padding: 1.5vh;
+    border: 2px solid darkblue;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 80, 0.2);
+}
+
+#auto_add_portion_picker label {
+    display: block;
+    margin-bottom: 1vh;
+    font-weight: bold;
+}
+
+#portion_options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8vh;
+}
+
+.portion-option-btn {
+    padding: 1vh 1.5vh;
+    border: 1px solid darkblue;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    background-color: rgb(0, 55, 255);
+    cursor: pointer;
+    transition: background-color 300ms ease;
+    text-align: left;
+    border-radius: 3px;
+}
+
+.portion-option-btn:hover {
+    background-color: darkblue;
+}
+
+/* Loading Indicator */
+#auto_add_loading {
+    text-align: center;
+    padding: 2vh;
+}
+
+.loading-text {
+    font-style: italic;
+    font-size: 110%;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+#auto_add_loading .loading-text {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
 @media screen and (min-width: 280px) and (max-width: 767px) {
     #food_meal_buttons {
         flex-direction: column;
@@ -458,5 +644,21 @@ input {
 
     .ingredient_and_serving input {
         width: 100%;
+    }
+
+    #auto_add_tabs {
+        flex-direction: column;
+    }
+
+    .auto-tab {
+        border-radius: 0;
+    }
+
+    .auto-tab:first-child {
+        border-radius: 5px 5px 0 0;
+    }
+
+    .auto-tab:last-child {
+        border-radius: 0 0 5px 5px;
     }
 }

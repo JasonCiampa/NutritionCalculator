@@ -1,36 +1,76 @@
+let expandedEntries = new Set();
+
 function currentDate() {
     let d = new Date();
     const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     document.getElementById('current_date').innerHTML = (String(month[d.getMonth()]) + ' ' + String(d.getDate()) + ',' + ' ' + String(d.getFullYear()));
 }
 
+function uniformizeEntryBoxes() {
+    const boxes = document.querySelectorAll('.entry-box');
+    if (boxes.length === 0) return;
+
+    boxes.forEach(box => {
+        box.style.width = '';
+        box.style.minHeight = '';
+    });
+
+    let maxWidth = 0;
+    let maxCollapsedHeight = 0;
+
+    boxes.forEach(box => {
+        maxWidth = Math.max(maxWidth, box.offsetWidth);
+        if (!box.classList.contains('expanded')) {
+            maxCollapsedHeight = Math.max(maxCollapsedHeight, box.offsetHeight);
+        }
+    });
+
+    boxes.forEach(box => {
+        box.style.width = maxWidth + 'px';
+        if (!box.classList.contains('expanded')) {
+            box.style.minHeight = maxCollapsedHeight + 'px';
+        }
+    });
+}
+
 function setNutritionToday() {
-    /**
-    
-    * This function gathers all of the information for calories, carbs, protein, and fat from the database
-      and updates their values in the innerHTML.
-    
-    * The lists are updated everytime the "Today's Nutrition" page loads (or is refreshed).
-    
-    */
     const request = openDatabase();
     request.onsuccess = function () {
         console.log("Database opened successfully");
         const db = request.result;
-        
+
         const nutritionTransaction = db.transaction("nutrition", "readwrite");
         const nutritionStore = nutritionTransaction.objectStore("nutrition");
-                
-        const currentDate = nutritionStore.get("currentDate");
-    
-        currentDate.onsuccess = function () {
-            if ((currentDate.result != undefined) && (currentDate.result.content === document.getElementById('current_date').innerHTML)) {
+
+        if (!localStorage.getItem('nutritionDataFormat_v2')) {
+            nutritionStore.put({ name: "eatenToday", content: [] });
+            nutritionStore.put({ name: "totalCals", content: 0 });
+            nutritionStore.put({ name: "totalCarbs", content: 0 });
+            nutritionStore.put({ name: "totalProtein", content: 0 });
+            nutritionStore.put({ name: "totalFat", content: 0 });
+            nutritionStore.put({ name: "currentDate", content: "" });
+            localStorage.setItem('nutritionDataFormat_v2', 'structured');
+            document.getElementById('total_calories').innerHTML = 0;
+            document.getElementById('total_carbs').innerHTML = 0;
+            document.getElementById('total_protein').innerHTML = 0;
+            document.getElementById('total_fat').innerHTML = 0;
+            document.getElementById('eaten_today').innerHTML = '';
+            nutritionTransaction.oncomplete = function () {
+                setNutritionToday();
+            };
+            return;
+        }
+
+        const currentDateReq = nutritionStore.get("currentDate");
+
+        currentDateReq.onsuccess = function () {
+            if ((currentDateReq.result != undefined) && (currentDateReq.result.content === document.getElementById('current_date').innerHTML)) {
                 const totalCals = nutritionStore.get("totalCals");
                 const totalCarbs = nutritionStore.get("totalCarbs");
                 const totalProtein = nutritionStore.get("totalProtein");
                 const totalFat = nutritionStore.get("totalFat");
                 const eatenToday = nutritionStore.get("eatenToday");
-            
+
                 totalCals.onsuccess = function () {
                     document.getElementById('total_calories').innerHTML = Math.round(totalCals.result.content * 100) / 100;
                 }
@@ -44,39 +84,85 @@ function setNutritionToday() {
                     document.getElementById('total_fat').innerHTML = Math.round(totalFat.result.content * 100) / 100;
                 }
                 eatenToday.onsuccess = function () {
-                    const foodsAndMealsEatenToday = document.getElementById('eaten_today');
-                    foodsAndMealsEatenToday.innerHTML = ""
+                    const container = document.getElementById('eaten_today');
+                    container.innerHTML = "";
 
-                    for (let i = 0; i < eatenToday.result.content.length; i++){
+                    for (let i = 0; i < eatenToday.result.content.length; i++) {
+                        const entry = eatenToday.result.content[i];
 
-                        const button = document.createElement("button");
-                        button.innerHTML = eatenToday.result.content[i]
+                        const box = document.createElement("div");
+                        box.className = expandedEntries.has(i) ? "entry-box expanded" : "entry-box";
 
-                        button.onclick = () => {
-                            let currentCharIndex = 1;
+                        const title = document.createElement("span");
+                        title.className = "entry-title";
+                        title.textContent = entry.name + " (" + entry.servings + "x)";
+                        box.appendChild(title);
 
-                            while (eatenToday.result.content[i].slice(currentCharIndex - 1, currentCharIndex) != "x") {
-                                currentCharIndex++; 
-                            }
+                        const details = document.createElement("div");
+                        details.className = "entry-details";
 
-                            let nameIndexStart = currentCharIndex + 1;
-                            currentCharIndex += 2;
-
-
-                            while (eatenToday.result.content[i].slice(currentCharIndex - 1, currentCharIndex) != "(") {
-                                currentCharIndex++; 
-                            }
-
-                            let foodName = eatenToday.result.content[i].slice(nameIndexStart, currentCharIndex - 2)
-
-                            document.getElementById("remove_nutrition_name").value = foodName;
-                            processForm(removeNutritionForm);
-                            setNutritionToday();
+                        const servingLine = document.createElement("p");
+                        servingLine.className = "entry-detail-serving";
+                        if (entry.type === "food") {
+                            servingLine.textContent = "Serving: " + entry.servingSize + " " + entry.measurementUnit;
+                        } else {
+                            servingLine.textContent = "Ingredients: " + entry.ingredients.join(", ");
                         }
+                        details.appendChild(servingLine);
 
-                        foodsAndMealsEatenToday.appendChild(button);
-                        foodsAndMealsEatenToday.appendChild(document.createElement("br"));
+                        const calsLine = document.createElement("p");
+                        calsLine.className = "entry-detail-cals";
+                        calsLine.textContent = "Calories: " + entry.cals;
+                        details.appendChild(calsLine);
+
+                        const carbsLine = document.createElement("p");
+                        carbsLine.className = "entry-detail-carbs";
+                        carbsLine.textContent = "Carbs: " + entry.carbs + "g";
+                        details.appendChild(carbsLine);
+
+                        const proteinLine = document.createElement("p");
+                        proteinLine.className = "entry-detail-protein";
+                        proteinLine.textContent = "Protein: " + entry.protein + "g";
+                        details.appendChild(proteinLine);
+
+                        const fatLine = document.createElement("p");
+                        fatLine.className = "entry-detail-fat";
+                        fatLine.textContent = "Fat: " + entry.fat + "g";
+                        details.appendChild(fatLine);
+
+                        const removeBtn = document.createElement("button");
+                        removeBtn.className = "entry-remove-btn";
+                        removeBtn.textContent = "Remove";
+                        removeBtn.addEventListener("click", function (e) {
+                            e.stopPropagation();
+                            expandedEntries.delete(i);
+                            const adjusted = new Set();
+                            expandedEntries.forEach(function (idx) {
+                                adjusted.add(idx > i ? idx - 1 : idx);
+                            });
+                            expandedEntries = adjusted;
+                            document.getElementById("remove_nutrition_name").value = entry.name;
+                            document.getElementById("remove_nutrition_index").value = i;
+                            processForm(removeNutritionForm);
+                        });
+                        details.appendChild(removeBtn);
+
+                        box.appendChild(details);
+
+                        box.addEventListener("click", function () {
+                            box.classList.toggle("expanded");
+                            if (box.classList.contains("expanded")) {
+                                expandedEntries.add(i);
+                            } else {
+                                expandedEntries.delete(i);
+                            }
+                            uniformizeEntryBoxes();
+                        });
+
+                        container.appendChild(box);
                     }
+
+                    uniformizeEntryBoxes();
                 }
             }
             else {
@@ -94,97 +180,118 @@ function setNutritionToday() {
     };
 }
 
+function filterFoodsAndMeals() {
+    const searchInput = document.getElementById('food_meal_search');
+    if (!searchInput) return;
+    const term = searchInput.value.toLowerCase();
+
+    const foodWrappers = document.querySelectorAll('#foodButtons .food-button-wrapper');
+    foodWrappers.forEach(wrapper => {
+        const name = wrapper.querySelector('button').textContent.toLowerCase();
+        wrapper.style.display = name.includes(term) ? '' : 'none';
+    });
+
+    const mealWrappers = document.querySelectorAll('#mealButtons .meal-button-wrapper');
+    mealWrappers.forEach(wrapper => {
+        const btn = wrapper.querySelector('button');
+        const name = btn.textContent.toLowerCase();
+        const ingredients = (btn.dataset.ingredients || '').toLowerCase();
+        const matches = name.includes(term) || ingredients.includes(term);
+        wrapper.style.display = matches ? '' : 'none';
+    });
+}
+
 function loadFoodsAndMeals() {
     const request = openDatabase();
-    
+
     request.onsuccess = function () {
         console.log("Database opened successfully");
         const db = request.result;
-          
-        const foodTransaction = db.transaction("foods", "readwrite");  
-        const mealTransaction = db.transaction("meals", "readwrite");      
+
+        const foodTransaction = db.transaction("foods", "readwrite");
+        const mealTransaction = db.transaction("meals", "readwrite");
         const foodStore = foodTransaction.objectStore("foods");
         const mealStore = mealTransaction.objectStore("meals");
 
         const foodStoreList = foodStore.getAll();
         const mealStoreList = mealStore.getAll();
-    
 
         foodStoreList.onsuccess = function () {
-            const foodList = document.getElementById('food_list');                                                                                              // Get a reference to the section element with the id food_list
+            const foodList = document.getElementById('food_list');
             foodList.innerHTML = "";
-            foodList.appendChild(document.createElement("h3")).innerHTML = "Foods";                                                                             // Create the "Foods" Text
-            foodList.appendChild(document.createElement("br"));                                                                                                 // Append a line break to the foodButtons unordered list (so that buttons stack)
+            foodList.appendChild(document.createElement("h3")).innerHTML = "Foods";
 
-            const foodButtons = document.createElement("ul");                                                                                                   // Create an Unordered List element to store the Buttons for each Food
-            foodButtons.id = "foodButtons";                                                                                                                     // Set the id for the foodButtons list to be "foodButtons"
-            
-            for (let i = 0; i < foodStoreList.result.length; i++) {                                                                                             // For every Food registered to the database...
-                const food = foodStoreList.result[i];                                                                                                               // Store a reference to the Food of this iteration
-                
-                const button = document.createElement("button");                                                                                                    // Create a new Button
-                button.innerHTML = food.name;                                                                                                                       // Set the Button's text to the food's name
-                
-                button.onclick = () => {                                                                                                                            // When the Button is clicked...
-                    document.getElementById("log_nutrition_name").value = food.name
-                    displayForm(logNutritionForm)
+            const foodButtons = document.createElement("ul");
+            foodButtons.id = "foodButtons";
+
+            for (let i = 0; i < foodStoreList.result.length; i++) {
+                const food = foodStoreList.result[i];
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "food-button-wrapper";
+
+                const button = document.createElement("button");
+                button.innerHTML = food.name;
+
+                button.onclick = () => {
+                    document.getElementById("log_nutrition_name").value = food.name;
+                    displayForm(logNutritionForm);
                 };
 
-
-                foodButtons.appendChild(button);                                                                                                                // Append the Button to the foodButtons unordered list
-                foodButtons.appendChild(document.createElement("br"));                                                                                          // Append a line break to the foodButtons unordered list (so that buttons stack)
-                foodButtons.appendChild(document.createElement("br"));                                                                                          // Append a line break to the foodButtons unordered list (so that buttons stack)
+                wrapper.appendChild(button);
+                foodButtons.appendChild(wrapper);
             }
 
             foodTransaction.oncomplete = function () {
-                db.close();                                                                                                                                     // Close the database
+                db.close();
             };
 
-            foodList.appendChild(foodButtons);                                                                                                                  // Add all of the newly created Food Buttons to the foodList
+            foodList.appendChild(foodButtons);
         };
 
-
-
         mealStoreList.onsuccess = function () {
-            const mealList = document.getElementById('meal_list');                                                                                              // Get a reference to the section element with the id meal_list
+            const mealList = document.getElementById('meal_list');
             mealList.innerHTML = "";
-            mealList.appendChild(document.createElement("h3")).innerHTML = "Meals";                                                                             // Create the "Meals" Text
-            mealList.appendChild(document.createElement("br"));                                                                                                 // Append a line break to the meal list unordered list
+            mealList.appendChild(document.createElement("h3")).innerHTML = "Meals";
 
-            const mealButtons = document.createElement("ul");                                                                                                   // Create an Unordered List element to store the Buttons for each meal
-            mealButtons.id = "mealButtons";                                                                                                                     // Set the id for the mealButtons list to be "mealButtons"
-            
-            for (let i = 0; i < mealStoreList.result.length; i++) {                                                                                             // For every meal registered to the database...
-                const meal = mealStoreList.result[i];                                                                                                               // Store a reference to the meal of this iteration
-                
-                const button = document.createElement("button");                                                                                                    // Create a new Button
-                button.innerHTML = meal.name;                                                                                                                       // Set the Button's text to the meal's name
-                
-                button.onclick = () => {                                                                                                                            // When the Button is clicked...
-                    document.getElementById("log_nutrition_name").value = meal.name
-                    displayForm(logNutritionForm)
+            const mealButtons = document.createElement("ul");
+            mealButtons.id = "mealButtons";
+
+            for (let i = 0; i < mealStoreList.result.length; i++) {
+                const meal = mealStoreList.result[i];
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "meal-button-wrapper";
+
+                const button = document.createElement("button");
+                button.innerHTML = meal.name;
+                button.dataset.ingredients = meal.ingredient_list.join(",");
+
+                button.onclick = () => {
+                    document.getElementById("log_nutrition_name").value = meal.name;
+                    displayForm(logNutritionForm);
                 };
 
-                mealButtons.appendChild(button);                                                                                                                // Append the Button to the mealButtons unordered list
-                mealButtons.appendChild(document.createElement("br"));                                                                                          // Append a line break to the mealButtons unordered list (so that buttons stack)
-                mealButtons.appendChild(document.createElement("br"));                                                                                          // Append a line break to the mealButtons unordered list (so that buttons stack)
+                wrapper.appendChild(button);
+                mealButtons.appendChild(wrapper);
             }
 
             mealTransaction.oncomplete = function () {
-                db.close();                                                                                                                                     // Close the database
+                db.close();
             };
 
-            mealList.appendChild(mealButtons);                                                                                                                  // Add all of the newly created meal Buttons to the mealList
+            mealList.appendChild(mealButtons);
         };
-
-
-
     };
 }
 
-// Calls the function whenever the page loads
 window.addEventListener("load", function() {
     currentDate();
     setNutritionToday();
     loadFoodsAndMeals();
+
+    const searchInput = document.getElementById('food_meal_search');
+    if (searchInput) {
+        searchInput.addEventListener("input", filterFoodsAndMeals);
+    }
 });

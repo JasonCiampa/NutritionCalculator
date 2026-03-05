@@ -31,16 +31,22 @@
         <section id="food_meal_choices">
             <h3>Select an option:</h3>
             <div id="food_meal_buttons">
-                <button id="add_food" onclick="displayForm(addFoodForm)" >Add/Update a Food</button>
-                <button id="add_meal" onclick="displayForm(addMealForm)">Add/Update a Meal</button>
-                <button id="remove" onclick="displayForm(removeForm)">Remove a Food/Meal</button>
-                <!-- <section id="view_nutrition">View the Nutrition of a Food or Meal</section>
-                <section id="view_registry">View All Foods and Meals</section> -->
+                <button id="add_food" onclick="showAddFoodChoice()">Add a Food</button>
+                <button id="add_meal" onclick="displayForm(addMealForm)">Add a Meal</button>
             </div>
 
             <div id="food_meal_forms">
+                <div id="add_food_choice" style="display:none;">
+                    <h3>How would you like to add a food?</h3>
+                    <div id="add_food_choice_buttons">
+                        <button type="button" id="manual_add_btn">Manual Add</button>
+                        <button type="button" id="auto_add_btn">Auto Add</button>
+                    </div>
+                    <button class="quit" type="button" id="add_food_choice_quit">Quit</button>
+                </div>
+
                 <form id="add_food_form">
-                    <h3>Provide the following data for your food to add it to the registry:<br><br>(If the name of the food that you enter already exists, that food will be updated) </h3>
+                    <h3>Provide the following data for your food to add it to the registry:</h3>
                     <h4><span class="error"></span></h4>
                     <p>Name: <input type="text" id="food_name" autocomplete="off"></p>
                     <p>Unit of Measurement: <input type="text" id="food_measurement_unit" autocomplete="off"></p>
@@ -56,14 +62,28 @@
                     </div>
                 </form>
 
+                <form id="auto_add_food_form" style="display:none;">
+                    <h3>Enter the name of the food you would like to add:</h3>
+                    <h4><span class="error"></span></h4>
+                    <p>Name: <input type="text" id="auto_food_name" autocomplete="off"></p>
+
+                    <div id="auto_add_food_bottom_buttons">
+                        <button class="submit" type="button">Submit</button>
+                        <button class="quit" type="button" onclick="closeForm(autoAddFoodForm)">Quit</button>
+                    </div>
+                </form>
+
                 <form id="add_meal_form">
-                    <h3>Provide the following data for your meal to add it to the registry:<br><br>(If the name of the meal that you enter already exists, that meal will be updated) </h3>
+                    <h3>Provide the following data for your meal to add it to the registry:</h3>
                     <h4><span class="error"></span></h4>
                     <p>Name: <input type="text" id="meal_name" autocomplete="off"></p>
                     <div id="ingredients">
                         <div class="ingredient_and_serving">
-                            <p>Ingredient: <input type="text" class="meal_ingredients" autocomplete="off"></p>  
-                            <p>Servings: <input type="text" class="meal_serving_sizes" autocomplete="off"></p>
+                            <div class="ingredient_field">Ingredient:
+                                <input type="text" class="meal_ingredients" autocomplete="off" oninput="filterIngredientDropdown(this)">
+                                <div class="ingredient-dropdown"></div>
+                            </div>
+                            <p>Servings: <input type="number" class="meal_serving_sizes" min="1" step="1" value="1" autocomplete="off"></p>
                         </div>
                     </div>
 
@@ -75,31 +95,20 @@
                     <div id="add_meal_bottom_buttons">
                         <button class="submit" type="button" onclick="processForm(addMealForm)">Submit</button>
                         <button class="quit" type="reset" onclick="closeForm(addMealForm)">Quit</button>
-                        
                     </div>
                 </form>
-
-                <form id="remove_form">
-                    <h3>Enter the name of the food/meal you would like to delete from the registry:</h3>
-                    <h4><span class="error"></span></h4>
-                    <p>Name: <input type="text" id="remove_name" autocomplete="off"></p>
-
-                    <div id="remove_bottom_buttons">
-                        <button class="submit" type="button" onclick="processForm(removeForm)">Submit</button>
-                        <button class="quit" type="reset" onclick="closeForm(removeForm)">Quit</button>
-                    </div>
-                </form>
-                
-
-                <form action=""></form>
-                <form action=""></form>
             </div>
         </section>
 
         <section id="nutritionViewer">
             <h3>View Nutrition</h3>
             <h5>Click any of the foods or meals below to view their nutrition</h5>
+            <div id="nutrition_viewer_entries"></div>
         </section>
+
+        <div id="food_meal_search_container">
+            <input type="text" id="food_meal_search" placeholder="Search foods and meals..." autocomplete="off">
+        </div>
 
         <div id="food_and_meal_lists">
             <section id="food_list">

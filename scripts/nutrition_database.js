@@ -80,8 +80,7 @@ const addMealButton = document.getElementById('add_meal');
 const modifyForm = document.getElementById('modify_form');
 const modifyButton = document.getElementById('modify');
 
-const removeForm = document.getElementById('remove_form');
-const removeButton = document.getElementById('remove');
+const autoAddFoodForm = document.getElementById('auto_add_food_form');
 
 const logNutritionForm = document.getElementById('log_nutrition_form');
 const logNutritionButton = document.getElementById('log_nutrition');
@@ -127,6 +126,28 @@ function closeForm(form) {
     for (i = 0; i < error.length; i++) {
         error[i].innerHTML = '';
     }
+    if (typeof editingItem !== 'undefined' && editingItem) {
+        editingItem = null;
+        const foodNameInput = document.getElementById('food_name');
+        if (foodNameInput) foodNameInput.readOnly = false;
+        const mealNameInput = document.getElementById('meal_name');
+        if (mealNameInput) mealNameInput.readOnly = false;
+    }
+    if (form.id === 'add_meal_form') {
+        const ingredientsDiv = document.getElementById('ingredients');
+        if (ingredientsDiv) {
+            const rows = ingredientsDiv.getElementsByClassName('ingredient_and_serving');
+            while (rows.length > 1) {
+                ingredientsDiv.removeChild(rows[rows.length - 1]);
+            }
+            if (rows.length > 0) {
+                const firstIngInput = rows[0].querySelector('.meal_ingredients');
+                const firstServInput = rows[0].querySelector('.meal_serving_sizes');
+                if (firstIngInput) firstIngInput.value = '';
+                if (firstServInput) firstServInput.value = '1';
+            }
+        }
+    }
 }
 
 function missingInformation() {
@@ -142,30 +163,42 @@ function missingInformation() {
 }
 
 function addIngredient() {
-/**
-
-* Builds a new ingredient and serving input box for the addMeal form.
-* Will activate whenever the user clicks the "Add Ingredient" button on the form.
-
-*/
     let div = document.createElement("div");
     div.className = "ingredient_and_serving";
 
-    let p_ingredient = document.createElement("p");
+    let p_ingredient = document.createElement("div");
+    p_ingredient.className = "ingredient_field";
     let ingredient_text = document.createTextNode("Ingredient: ");
     let ingredient_input = document.createElement("input");
+    ingredient_input.type = "text";
     ingredient_input.className = "meal_ingredients";
+    ingredient_input.autocomplete = "off";
+    ingredient_input.setAttribute("oninput", "filterIngredientDropdown(this)");
+
+    let dropdown = document.createElement("div");
+    dropdown.className = "ingredient-dropdown";
+
     p_ingredient.appendChild(ingredient_text);
     p_ingredient.appendChild(ingredient_input);
+    p_ingredient.appendChild(dropdown);
+
+    if (typeof populateIngredientDropdown === 'function') {
+        populateIngredientDropdown(dropdown, ingredient_input);
+    }
 
     let p_servings = document.createElement("p");
     let servings_text = document.createTextNode("Servings: ");
     let servings_input = document.createElement("input");
+    servings_input.type = "number";
     servings_input.className = "meal_serving_sizes";
+    servings_input.min = "1";
+    servings_input.step = "1";
+    servings_input.value = "1";
+    servings_input.autocomplete = "off";
     p_servings.appendChild(servings_text);
     p_servings.appendChild(servings_input);
 
-    ingredientsList = document.getElementById("ingredients");
+    let ingredientsList = document.getElementById("ingredients");
 
     div.appendChild(p_ingredient);
     div.appendChild(p_servings);
@@ -225,30 +258,93 @@ function processForm(form) {
         }
 
         let food = new Food(name, measurement_unit, serving_size, calories, carbs, protein, fat);
-        
+        let isEditing = (typeof editingItem !== 'undefined' && editingItem && editingItem.type === 'food');
+
         const request = openDatabase();
         request.onsuccess = function () {
-            console.log("Database opened successfully");
             const db = request.result;
-            const foodTransaction = db.transaction("foods", "readwrite");        
-            const foodStore = foodTransaction.objectStore("foods");
 
-            foodStore.put({ name: food.name, measurement_unit: food.measurement_unit, serving_size: food.serving_size, cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat });
+            if (isEditing) {
+                const foodTransaction = db.transaction("foods", "readwrite");
+                const foodStore = foodTransaction.objectStore("foods");
+                foodStore.put({ name: food.name, measurement_unit: food.measurement_unit, serving_size: food.serving_size, cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat });
 
-            foodTransaction.oncomplete = function () {
-              db.close();
-            };
+                foodTransaction.oncomplete = function () {
+                    if (typeof viewedItems !== 'undefined' && viewedItems.has("food:" + food.name)) {
+                        viewedItems.set("food:" + food.name, {
+                            name: food.name, type: "food",
+                            serving_size: food.serving_size, measurement_unit: food.measurement_unit,
+                            cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat
+                        });
+                    }
+                    cascadeFoodEditToMeals(food.name, db, function (affectedMealNames) {
+                        let allAffected = [food.name].concat(affectedMealNames);
+                        updateTodaysNutritionAfterEdit(allAffected, db, function () {
+                            renderNutritionViewer();
+                            loadCachedFoods(function () {
+                                setNutritionLists();
+                                populateAllIngredientDropdowns();
+                            });
+                        });
+                    });
+                };
+
+                document.getElementById("food_name").value = '';
+                document.getElementById("food_measurement_unit").value = '';
+                document.getElementById("food_serving_size").value = '';
+                document.getElementById("food_calories").value = '';
+                document.getElementById("food_carbs").value = '';
+                document.getElementById("food_protein").value = '';
+                document.getElementById("food_fat").value = '';
+                closeForm(form);
+            } else {
+                const checkTransaction = db.transaction(["foods", "meals"], "readonly");
+                const cFoodStore = checkTransaction.objectStore("foods");
+                const cMealStore = checkTransaction.objectStore("meals");
+                const foodCheck = cFoodStore.get(name);
+                const mealCheck = cMealStore.get(name);
+
+                let nameExists = false;
+                foodCheck.onsuccess = function () { if (foodCheck.result) nameExists = true; };
+                mealCheck.onsuccess = function () { if (mealCheck.result) nameExists = true; };
+
+                checkTransaction.oncomplete = function () {
+                    if (nameExists) {
+                        let error = document.getElementsByClassName('error');
+                        for (let i = 0; i < error.length; i++) {
+                            error[i].innerHTML = "A food or meal with this name already exists.";
+                        }
+                        db.close();
+                        return;
+                    }
+
+                    const saveTransaction = db.transaction("foods", "readwrite");
+                    const saveFoodStore = saveTransaction.objectStore("foods");
+                    saveFoodStore.put({ name: food.name, measurement_unit: food.measurement_unit, serving_size: food.serving_size, cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat });
+
+                    saveTransaction.oncomplete = function () {
+                        db.close();
+                    };
+
+                    document.getElementById("food_name").value = '';
+                    document.getElementById("food_measurement_unit").value = '';
+                    document.getElementById("food_serving_size").value = '';
+                    document.getElementById("food_calories").value = '';
+                    document.getElementById("food_carbs").value = '';
+                    document.getElementById("food_protein").value = '';
+                    document.getElementById("food_fat").value = '';
+                    closeForm(form);
+                    if (typeof loadCachedFoods === 'function') {
+                        loadCachedFoods(function () {
+                            setNutritionLists();
+                            populateAllIngredientDropdowns();
+                        });
+                    } else {
+                        setNutritionLists();
+                    }
+                };
+            }
         };
-
-        document.getElementById("food_name").value = '';
-        document.getElementById("food_measurement_unit").value = '';
-        document.getElementById("food_serving_size").value = '';
-        document.getElementById("food_calories").value = '';
-        document.getElementById("food_carbs").value = '';
-        document.getElementById("food_protein").value = '';
-        document.getElementById("food_fat").value = '';
-        closeForm(form);
-        setNutritionLists();
     }
 
     /**
@@ -273,27 +369,43 @@ function processForm(form) {
         let ingredient_list = [];
         let serving_list = [];
 
-        if (name !== '') {
-            const request = openDatabase();
-            request.onsuccess = function () {
-                console.log("Database opened successfully");
-                const db = request.result;
-                const foodTransaction = db.transaction("foods", "readwrite");        
+        if (name === '') {
+            missingInformation();
+            return;
+        }
+
+        let isEditing = (typeof editingItem !== 'undefined' && editingItem && editingItem.type === 'meal');
+
+        const request = openDatabase();
+        request.onsuccess = function () {
+            const db = request.result;
+
+            function doMealProcessing() {
+                const foodTransaction = db.transaction("foods", "readonly");
                 const foodStore = foodTransaction.objectStore("foods");
                 const foodList = foodStore.getAll();
 
                 foodList.onsuccess = function () {
                     for (let i = 0; i < temp_ingredient_list.length; i++) {
+                        let servingVal = parseFloat(temp_serving_list[i].value);
+                        if (isNaN(servingVal) || servingVal < 1) {
+                            servingVal = 1;
+                            temp_serving_list[i].value = '1';
+                        }
+
                         if ((temp_ingredient_list[i].value !== '') && (temp_serving_list[i].value !== '')){
                             let ingredientExists = false;
+                            let matchedName = '';
                             for (let f = 0; f < foodList.result.length; f++) {
-                                if (foodList.result[f].name === (temp_ingredient_list[i].value)) {
-                                    ingredient_list.push(temp_ingredient_list[i].value);
-                                    serving_list.push(temp_serving_list[i].value);
+                                if (foodList.result[f].name.toLowerCase() === temp_ingredient_list[i].value.toLowerCase()) {
+                                    matchedName = foodList.result[f].name;
+                                    ingredient_list.push(matchedName);
+                                    serving_list.push(String(servingVal));
                                     ingredientExists = true;
+                                    break;
                                 }
                             }
-                            
+
                             if (ingredientExists === false) {
                                 let notRegistered = temp_ingredient_list[i].value;
                                 error = document.getElementsByClassName('error');
@@ -309,129 +421,115 @@ function processForm(form) {
                         }
                     }
 
-                    let cals = 0;
-                    let carbs = 0;
-                    let protein = 0;
-                    let fat = 0;
-        
-                    let meal = new Meal(name, ingredient_list, serving_list, cals, carbs, protein, fat);
-        
+                    let mergedIngredients = [];
+                    let mergedServings = [];
+                    for (let i = 0; i < ingredient_list.length; i++) {
+                        let dupeIndex = mergedIngredients.indexOf(ingredient_list[i]);
+                        if (dupeIndex !== -1) {
+                            mergedServings[dupeIndex] = String(parseFloat(mergedServings[dupeIndex]) + parseFloat(serving_list[i]));
+                        } else {
+                            mergedIngredients.push(ingredient_list[i]);
+                            mergedServings.push(serving_list[i]);
+                        }
+                    }
+                    ingredient_list = mergedIngredients;
+                    serving_list = mergedServings;
+
+                    let ingredientsDone = 0;
+                    let totalCals = 0, totalCarbs = 0, totalProtein = 0, totalFat = 0;
+
                     for (let i = 0; i < ingredient_list.length; i++) {
                         const food = foodStore.get(ingredient_list[i]);
                         food.onsuccess = function () {
-        
-                            const mealTransaction = db.transaction("meals", "readwrite");
-                            const mealStore = mealTransaction.objectStore("meals");
-        
-                            cals += parseFloat(food.result.cals) * parseFloat(serving_list[i]);
-                            carbs += parseFloat(food.result.carbs) * parseFloat(serving_list[i]);
-                            protein += parseFloat(food.result.protein) * parseFloat(serving_list[i]);
-                            fat += parseFloat(food.result.fat) * parseFloat(serving_list[i]);
-        
-                            mealStore.put( { name: meal.name, ingredient_list: meal.ingredient_list, serving_list: meal.serving_list, cals: (meal.cals + cals), carbs: (meal.carbs + carbs), protein: (meal.protein + protein), fat: (meal.fat + fat) });
-                            
-                            mealTransaction.oncomplete = function () {
-                                db.close();
-                            };
+                            totalCals += parseFloat(food.result.cals) * parseFloat(serving_list[i]);
+                            totalCarbs += parseFloat(food.result.carbs) * parseFloat(serving_list[i]);
+                            totalProtein += parseFloat(food.result.protein) * parseFloat(serving_list[i]);
+                            totalFat += parseFloat(food.result.fat) * parseFloat(serving_list[i]);
+
+                            ingredientsDone++;
+                            if (ingredientsDone === ingredient_list.length) {
+                                const mealTransaction = db.transaction("meals", "readwrite");
+                                const mealStore = mealTransaction.objectStore("meals");
+
+                                mealStore.put({
+                                    name: name,
+                                    ingredient_list: ingredient_list,
+                                    serving_list: serving_list,
+                                    cals: Math.round(totalCals * 100) / 100,
+                                    carbs: Math.round(totalCarbs * 100) / 100,
+                                    protein: Math.round(totalProtein * 100) / 100,
+                                    fat: Math.round(totalFat * 100) / 100
+                                });
+
+                                mealTransaction.oncomplete = function () {
+                                    if (isEditing) {
+                                        if (typeof viewedItems !== 'undefined' && viewedItems.has("meal:" + name)) {
+                                            viewedItems.set("meal:" + name, {
+                                                name: name, type: "meal",
+                                                ingredient_list: ingredient_list,
+                                                serving_list: serving_list,
+                                                cals: Math.round(totalCals * 100) / 100,
+                                                carbs: Math.round(totalCarbs * 100) / 100,
+                                                protein: Math.round(totalProtein * 100) / 100,
+                                                fat: Math.round(totalFat * 100) / 100
+                                            });
+                                        }
+                                        updateTodaysNutritionAfterEdit([name], db, function () {
+                                            renderNutritionViewer();
+                                            loadCachedFoods(function () {
+                                                setNutritionLists();
+                                                populateAllIngredientDropdowns();
+                                            });
+                                        });
+                                    } else {
+                                        db.close();
+                                        if (typeof loadCachedFoods === 'function') {
+                                            loadCachedFoods(function () {
+                                                setNutritionLists();
+                                                populateAllIngredientDropdowns();
+                                            });
+                                        } else {
+                                            setNutritionLists();
+                                        }
+                                    }
+                                };
+                            }
                         };
                     }
-                    
+
                     document.getElementById("meal_name").value = '';
-                    for (i = 0; i < temp_ingredient_list.length; i++) {
-                        temp_ingredient_list[i].value = '';
-                        temp_serving_list[i].value = '';
+                    for (let j = 0; j < temp_ingredient_list.length; j++) {
+                        temp_ingredient_list[j].value = '';
+                        temp_serving_list[j].value = '1';
                     }
                     closeForm(form);
-                    setNutritionLists();
-        
-                    foodTransaction.oncomplete = function () {
-                        db.close();
-                    }
-                }
+                };
             }
-        }
-        else {
-            missingInformation();
-            return
-        }
-    }
 
-    /**
-    * In the removeForm case, the name is intialized and checked for missing information. If it is missing
-      information, the user is prompted with the "missing information" error.
+            if (!isEditing) {
+                const checkTransaction = db.transaction(["foods", "meals"], "readonly");
+                const cFoodStore = checkTransaction.objectStore("foods");
+                const cMealStore = checkTransaction.objectStore("meals");
+                const foodCheck = cFoodStore.get(name);
+                const mealCheck = cMealStore.get(name);
 
-    * Otherwise, the database is opened and the program attempts to remove the given name from the
-      food store first. If the name is not located there, the program then tries the meal store. 
-      
-    * If the program can't find the name in the meal store, it knows it isn't in the database, so
-      it prompts the user with the "food/meal not in registry" error.
+                let nameExists = false;
+                foodCheck.onsuccess = function () { if (foodCheck.result) nameExists = true; };
+                mealCheck.onsuccess = function () { if (mealCheck.result) nameExists = true; };
 
-    * If the food/meal is found, the page is reloaded afterwards to update the lists.
-
-     */
-
-    else if (form === removeForm) {
-        let name = document.getElementById('remove_name').value;
-
-        if (name === '') {
-            missingInformation();
-            return
-        }
-
-        const request = openDatabase();
-        request.onsuccess = function () {
-            console.log("Database opened successfully");
-            const db = request.result;
-
-            const foodTransaction = db.transaction("foods", "readwrite");        
-            const foodStore = foodTransaction.objectStore("foods");
-            const foodList = foodStore.getAll();
-
-            foodList.onsuccess = function () {
-                let foodFound = false;
-                for (let i = 0; i < foodList.result.length; i++) {
-                    if (foodList.result[i].name === name) {
-                        foodFound = true;
-                        break;
+                checkTransaction.oncomplete = function () {
+                    if (nameExists) {
+                        let error = document.getElementsByClassName('error');
+                        for (let i = 0; i < error.length; i++) {
+                            error[i].innerHTML = "A food or meal with this name already exists.";
+                        }
+                        db.close();
+                        return;
                     }
-                }
-
-                if (foodFound === true) {
-                    const deleteFood = foodStore.delete(name);
-                    document.getElementById('remove_name').value = '';
-                    closeForm(form);
-                    setNutritionLists();
-                    return;
-                }
-                else {
-                    const mealTransaction = db.transaction("meals", "readwrite");
-                    const mealStore = mealTransaction.objectStore("meals");
-                    const mealList = mealStore.getAll();
-                    
-                    mealList.onsuccess = function () {
-                        let mealFound = false;
-                        for (let i = 0; i < mealList.result.length; i++) {
-                            if (mealList.result[i].name === name) {
-                                mealFound = true;
-                                break;
-                            }
-                        }
-
-                        if (mealFound === true) {
-                            const deleteMeal = mealStore.delete(name);
-                            document.getElementById('remove_name').value = '';
-                            closeForm(form);
-                            setNutritionLists();
-                        }
-                        else {
-                            error = document.getElementsByClassName('error');
-                            for (i = 0; i < error.length; i++) {
-                                error[i].innerHTML = "The food/meal you entered is not registered.";
-                            }
-                            return;
-                        }
-                    }
-                }
+                    doMealProcessing();
+                };
+            } else {
+                doMealProcessing();
             }
         };
     }

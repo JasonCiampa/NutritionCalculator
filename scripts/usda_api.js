@@ -98,9 +98,9 @@ function extractNutrients(foodData) {
 
     for (let i = 0; i < list.length; i++) {
         const fn = list[i];
-        const name = (fn.nutrient && fn.nutrient.name) || fn.name || "";
-        const unit = (fn.nutrient && fn.nutrient.unitName) || fn.unitName || "";
-        const amount = fn.amount || 0;
+        const name = (fn.nutrient && fn.nutrient.name) || fn.nutrientName || fn.name || "";
+        const unit = ((fn.nutrient && fn.nutrient.unitName) || fn.unitName || "").toLowerCase();
+        const amount = fn.amount != null ? fn.amount : (fn.value || 0);
 
         if (name === "Energy" && unit === "kcal") {
             nutrients.calories = amount;
@@ -160,6 +160,65 @@ function extractPortions(foodData) {
     }
 
     const has100g = portions.some(function (p) { return p.gramWeight === 100; });
+    if (!has100g) {
+        portions.push({
+            description: "100g",
+            gramWeight: 100,
+            amount: 100
+        });
+    }
+
+    return portions;
+}
+
+function extractPortionsFromSearchResult(food) {
+    var portions = [];
+
+    if (food.servingSize) {
+        var servingDesc = "";
+        if (food.householdServingFullText) {
+            servingDesc = food.householdServingFullText +
+                " (" + food.servingSize + (food.servingSizeUnit || "g") + ")";
+        } else {
+            servingDesc = food.servingSize + (food.servingSizeUnit || "g");
+        }
+        portions.push({
+            description: servingDesc,
+            gramWeight: food.servingSize,
+            amount: 1
+        });
+    }
+
+    if (food.foodMeasures) {
+        for (var i = 0; i < food.foodMeasures.length; i++) {
+            var m = food.foodMeasures[i];
+            if (!m.gramWeight) continue;
+            var desc = "";
+            if (m.disseminationText) {
+                desc = m.disseminationText;
+            } else {
+                desc = (m.value || 1) + " " + (m.modifier || m.measureUnitName || "");
+            }
+            if (m.gramWeight) {
+                desc += " (" + m.gramWeight + "g)";
+            }
+            desc = desc.trim();
+            if (!desc) continue;
+
+            var isDuplicate = portions.some(function (p) {
+                return p.gramWeight === m.gramWeight && p.description === desc;
+            });
+            if (!isDuplicate) {
+                portions.push({
+                    description: desc,
+                    gramWeight: m.gramWeight,
+                    amount: m.value || 1
+                });
+            }
+        }
+    }
+
+    var has100g = portions.some(function (p) { return p.gramWeight === 100; });
     if (!has100g) {
         portions.push({
             description: "100g",

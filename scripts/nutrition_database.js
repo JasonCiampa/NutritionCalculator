@@ -432,6 +432,8 @@ function processForm(form) {
         }
 
         let isEditing = (typeof editingItem !== 'undefined' && editingItem && editingItem.type === 'meal');
+        let mealOldName = isEditing ? editingItem.originalName : null;
+        let mealNameChanged = isEditing && (name !== mealOldName);
 
         const request = openDatabase();
         request.onsuccess = function () {
@@ -445,7 +447,7 @@ function processForm(form) {
                 foodList.onsuccess = function () {
                     for (let i = 0; i < temp_ingredient_list.length; i++) {
                         let servingVal = parseFloat(temp_serving_list[i].value);
-                        if (isNaN(servingVal) || servingVal < 1) {
+                        if (isNaN(servingVal) || servingVal <= 0) {
                             servingVal = 1;
                             temp_serving_list[i].value = '1';
                         }
@@ -465,9 +467,9 @@ function processForm(form) {
 
                             if (ingredientExists === false) {
                                 let notRegistered = temp_ingredient_list[i].value;
-                                error = document.getElementsByClassName('error');
-                                for (i = 0; i < error.length; i++) {
-                                    error[i].innerHTML = `${notRegistered} is not registered, and therefore cannot be included in this meal.`;
+                                let errorEls = document.getElementsByClassName('error');
+                                for (let e = 0; e < errorEls.length; e++) {
+                                    errorEls[e].innerHTML = `${notRegistered} is not registered, and therefore cannot be included in this meal.`;
                                 }
                                 return
                             }
@@ -505,8 +507,6 @@ function processForm(form) {
 
                             ingredientsDone++;
                             if (ingredientsDone === ingredient_list.length) {
-                                var mealOldName = isEditing ? editingItem.originalName : null;
-                                var mealNameChanged = isEditing && (name !== mealOldName);
 
                                 const mealTransaction = db.transaction("meals", "readwrite");
                                 const mealStore = mealTransaction.objectStore("meals");
@@ -585,7 +585,7 @@ function processForm(form) {
                 };
             }
 
-            var mealNeedsNameCheck = !isEditing || (isEditing && name !== editingItem.originalName);
+            var mealNeedsNameCheck = !isEditing || mealNameChanged;
 
             if (mealNeedsNameCheck) {
                 const checkTransaction = db.transaction(["foods", "meals"], "readonly");
@@ -633,7 +633,7 @@ function processForm(form) {
     else if (form === logNutritionForm) {
         let name = document.getElementById("log_nutrition_name").value;
         let numServings = parseFloat(document.getElementById("log_nutrition_servings").value);
-        if (isNaN(numServings) || numServings < 1) {
+        if (isNaN(numServings) || numServings <= 0) {
             numServings = 1;
         }
         

@@ -460,28 +460,157 @@ function onFoodSelected(fdcId, foodName) {
 
     getFoodDetails(fdcId)
         .then(function (foodData) {
-            hideAutoAddLoading();
-
-            var portions = extractPortions(foodData);
-            var nutrientsPer100g = extractNutrients(foodData);
-
-            if (portions.length > 1) {
-                showPortionPicker(portions, function (selectedPortion) {
-                    var scaled = scaleNutrients(nutrientsPer100g, selectedPortion.gramWeight);
-                    autoFillFoodForm(foodName, scaled, selectedPortion);
-                });
-            } else if (portions.length === 1) {
-                var scaled = scaleNutrients(nutrientsPer100g, portions[0].gramWeight);
-                autoFillFoodForm(foodName, scaled, portions[0]);
-            } else {
-                autoFillFoodForm(foodName, nutrientsPer100g, null);
-            }
+            handleFoodDetailResult(foodData, foodName);
         })
         .catch(function (err) {
-            hideAutoAddLoading();
-            console.error("Food detail fetch error:", err);
-            showAutoAddError("Failed to fetch food details. " + err.message);
+            console.warn("Detail fetch failed for fdcId " + fdcId + ", trying fallback:", err.message);
+            searchFoods(foodName, null, null, 25)
+                .then(function (searchResult) {
+                    if (!searchResult.foods || searchResult.foods.length === 0) {
+                        throw err;
+                    }
+
+                    var originalMatch = null;
+                    var ndbNumber = null;
+
+                    for (var i = 0; i < searchResult.foods.length; i++) {
+                        var food = searchResult.foods[i];
+                        if (food.fdcId === fdcId || food.description === foodName) {
+                            if (!originalMatch) {
+                                originalMatch = food;
+                                ndbNumber = food.ndbNumber || null;
+                            }
+                        }
+                    }
+                    if (!originalMatch) originalMatch = searchResult.foods[0];
+
+                    var bestCandidate = findBestCandidate(searchResult.foods, fdcId, ndbNumber);
+
+                    if (bestCandidate) {
+                        return getFoodDetails(bestCandidate.fdcId)
+                            .then(function (foodData) {
+                                handleFoodDetailResult(foodData, foodName);
+                            })
+                            .catch(function () {
+                                return trySRLegacyFallback(fdcId, ndbNumber, foodName, originalMatch);
+                            });
+                    }
+
+                    return trySRLegacyFallback(fdcId, ndbNumber, foodName, originalMatch);
+                })
+                .catch(function (fallbackErr) {
+                    hideAutoAddLoading();
+                    console.error("Food detail fetch error (after fallback):", fallbackErr);
+                    showAutoAddError("Failed to fetch food details. " + err.message);
+                });
         });
+}
+
+function findBestCandidate(foods, failedFdcId, ndbNumber) {
+    if (!ndbNumber) return null;
+
+    for (var i = 0; i < foods.length; i++) {
+        var food = foods[i];
+        if (food.fdcId === failedFdcId) continue;
+        if (food.dataType === "Foundation") continue;
+        if (food.ndbNumber === ndbNumber) {
+            return food;
+        }
+    }
+
+    return null;
+}
+
+function getSimplifiedSearchTerm(name) {
+    var parts = name.split(",");
+    if (parts.length <= 1) return null;
+    return parts[parts.length - 1].trim();
+}
+
+function trySRLegacyFallback(failedFdcId, ndbNumber, foodName, originalSearchMatch) {
+    var simplified = getSimplifiedSearchTerm(foodName);
+    if (!simplified) {
+        handleSearchResultFallback(originalSearchMatch, foodName);
+        return;
+    }
+
+    return searchFoods(simplified, ["SR Legacy"], null, 25)
+        .then(function (result) {
+            if (!result.foods || result.foods.length === 0) {
+                handleSearchResultFallback(originalSearchMatch, foodName);
+                return;
+            }
+
+            var candidate = null;
+            for (var i = 0; i < result.foods.length; i++) {
+                if (result.foods[i].fdcId === failedFdcId) continue;
+                if (ndbNumber && result.foods[i].ndbNumber === ndbNumber) {
+                    candidate = result.foods[i];
+                    break;
+                }
+            }
+            if (!candidate) {
+                for (var j = 0; j < result.foods.length; j++) {
+                    if (result.foods[j].fdcId !== failedFdcId) {
+                        candidate = result.foods[j];
+                        break;
+                    }
+                }
+            }
+
+            if (candidate) {
+                return getFoodDetails(candidate.fdcId)
+                    .then(function (foodData) {
+                        handleFoodDetailResult(foodData, foodName);
+                    })
+                    .catch(function () {
+                        handleSearchResultFallback(originalSearchMatch, foodName);
+                    });
+            }
+
+            handleSearchResultFallback(originalSearchMatch, foodName);
+        })
+        .catch(function () {
+            handleSearchResultFallback(originalSearchMatch, foodName);
+        });
+}
+
+function handleFoodDetailResult(foodData, foodName) {
+    hideAutoAddLoading();
+
+    var portions = extractPortions(foodData);
+    var nutrientsPer100g = extractNutrients(foodData);
+
+    if (portions.length > 1) {
+        showPortionPicker(portions, function (selectedPortion) {
+            var scaled = scaleNutrients(nutrientsPer100g, selectedPortion.gramWeight);
+            autoFillFoodForm(foodName, scaled, selectedPortion);
+        });
+    } else if (portions.length === 1) {
+        var scaled = scaleNutrients(nutrientsPer100g, portions[0].gramWeight);
+        autoFillFoodForm(foodName, scaled, portions[0]);
+    } else {
+        autoFillFoodForm(foodName, nutrientsPer100g, null);
+    }
+}
+
+function handleSearchResultFallback(searchFood, foodName) {
+    hideAutoAddLoading();
+
+    var nutrientsPer100g = extractNutrients(searchFood);
+    var portions = extractPortionsFromSearchResult(searchFood);
+
+    if (portions.length > 1) {
+        showPortionPicker(portions, function (selectedPortion) {
+            var scaled = scaleNutrients(nutrientsPer100g, selectedPortion.gramWeight);
+            autoFillFoodForm(foodName, scaled, selectedPortion);
+        });
+    } else if (portions.length === 1) {
+        var scaled = scaleNutrients(nutrientsPer100g, portions[0].gramWeight);
+        autoFillFoodForm(foodName, scaled, portions[0]);
+    } else {
+        autoFillFoodForm(foodName, nutrientsPer100g, null);
+    }
 }
 
 function showPortionPicker(portions, onSelect) {

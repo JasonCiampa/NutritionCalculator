@@ -285,6 +285,27 @@ function loadFoodsAndMeals() {
     };
 }
 
+function resetNutrition() {
+    const request = openDatabase();
+    request.onsuccess = function () {
+        const db = request.result;
+        const nutritionTransaction = db.transaction("nutrition", "readwrite");
+        const nutritionStore = nutritionTransaction.objectStore("nutrition");
+
+        nutritionStore.put({ name: "eatenToday", content: [] });
+        nutritionStore.put({ name: "totalCals", content: 0 });
+        nutritionStore.put({ name: "totalCarbs", content: 0 });
+        nutritionStore.put({ name: "totalProtein", content: 0 });
+        nutritionStore.put({ name: "totalFat", content: 0 });
+
+        nutritionTransaction.oncomplete = function () {
+            db.close();
+            expandedEntries.clear();
+            setNutritionToday();
+        };
+    };
+}
+
 window.addEventListener("load", function() {
     currentDate();
     setNutritionToday();
@@ -293,5 +314,47 @@ window.addEventListener("load", function() {
     const searchInput = document.getElementById('food_meal_search');
     if (searchInput) {
         searchInput.addEventListener("input", filterFoodsAndMeals);
+    }
+
+    var resetBtn = document.getElementById('reset_nutrition_btn');
+    if (resetBtn) {
+        resetBtn.addEventListener("click", function () {
+            var container = document.getElementById('reset_nutrition_container');
+            var existing = container.querySelector('.delete-confirm-panel');
+            if (existing) {
+                existing.remove();
+                return;
+            }
+
+            var panel = document.createElement("div");
+            panel.className = "delete-confirm-panel";
+
+            var msg = document.createElement("h4");
+            msg.textContent = "Are you sure you want to reset today's nutrition?";
+            panel.appendChild(msg);
+
+            var btnRow = document.createElement("div");
+            btnRow.className = "delete-confirm-buttons";
+
+            var confirmBtn = document.createElement("button");
+            confirmBtn.className = "delete-confirm-yes";
+            confirmBtn.textContent = "Reset";
+            confirmBtn.addEventListener("click", function () {
+                panel.remove();
+                resetNutrition();
+            });
+
+            var cancelBtn = document.createElement("button");
+            cancelBtn.className = "delete-confirm-cancel";
+            cancelBtn.textContent = "Cancel";
+            cancelBtn.addEventListener("click", function () {
+                panel.remove();
+            });
+
+            btnRow.appendChild(confirmBtn);
+            btnRow.appendChild(cancelBtn);
+            panel.appendChild(btnRow);
+            container.appendChild(panel);
+        });
     }
 });

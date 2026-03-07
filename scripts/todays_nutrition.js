@@ -426,10 +426,13 @@ function setNutritionToday() {
                 document.getElementById('total_protein').innerHTML = 0;
                 document.getElementById('total_fat').innerHTML = 0;
                 document.getElementById('eaten_today').innerHTML = '';
+                cachedEatenToday = [];
                 const eatenToday = nutritionStore.get("eatenToday");
                 eatenToday.onsuccess = function () {
                     nutritionStore.put({ name: "eatenToday", content: [] });
                 }
+                updateMacroGoalDisplay();
+                renderMicroTotals();
             }
         }
     };

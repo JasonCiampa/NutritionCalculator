@@ -3,37 +3,37 @@ var labelImageData = null;
 var labelScanActive = false;
 
 var LABEL_PATTERNS = [
-    { pattern: /calories\s*[:\s]*(\d+)/i, key: 'calories', field: 'food_calories' },
-    { pattern: /total\s*fat\s*[:\s]*([\d.]+)\s*g/i, key: 'fat', field: 'food_fat' },
-    { pattern: /saturated\s*fat\s*[:\s]*([\d.]+)\s*g/i, key: 'saturatedFat', field: 'food_saturatedFat' },
-    { pattern: /trans\s*fat\s*[:\s]*([\d.]+)\s*g/i, key: 'transFat', field: 'food_transFat' },
-    { pattern: /cholesterol\s*[:\s]*([\d.]+)\s*mg/i, key: 'cholesterol', field: 'food_cholesterol' },
-    { pattern: /sodium\s*[:\s]*([\d.]+)\s*mg/i, key: 'sodium', field: 'food_sodium' },
-    { pattern: /total\s*carb(?:ohydrate)?s?\s*[:\s]*([\d.]+)\s*g/i, key: 'carbs', field: 'food_carbs' },
-    { pattern: /dietary\s*fiber\s*[:\s]*([\d.]+)\s*g/i, key: 'fiber', field: 'food_fiber' },
-    { pattern: /total\s*sugars?\s*[:\s]*([\d.]+)\s*g/i, key: 'sugars', field: 'food_sugars' },
-    { pattern: /(?:incl\.\s*)?added\s*sugars?\s*[:\s]*([\d.]+)\s*g/i, key: 'addedSugars', field: 'food_addedSugars' },
-    { pattern: /protein\s*[:\s]*([\d.]+)\s*g/i, key: 'protein', field: 'food_protein' },
-    { pattern: /vitamin\s*d\s*[:\s]*([\d.]+)\s*mcg/i, key: 'vitaminD', field: 'food_vitaminD' },
-    { pattern: /calcium\s*[:\s]*([\d.]+)\s*mg/i, key: 'calcium', field: 'food_calcium' },
-    { pattern: /iron\s*[:\s]*([\d.]+)\s*mg/i, key: 'iron', field: 'food_iron' },
-    { pattern: /potassium\s*[:\s]*([\d.]+)\s*mg/i, key: 'potassium', field: 'food_potassium' },
-    { pattern: /vitamin\s*a\s*[:\s]*([\d.]+)\s*mcg/i, key: 'vitaminA', field: 'food_vitaminA' },
-    { pattern: /vitamin\s*c\s*[:\s]*([\d.]+)\s*mg/i, key: 'vitaminC', field: 'food_vitaminC' },
-    { pattern: /vitamin\s*e\s*[:\s]*([\d.]+)\s*mg/i, key: 'vitaminE', field: 'food_vitaminE' },
-    { pattern: /vitamin\s*k\s*[:\s]*([\d.]+)\s*mcg/i, key: 'vitaminK', field: 'food_vitaminK' },
-    { pattern: /thiamin\s*[:\s]*([\d.]+)\s*mg/i, key: 'thiamin', field: 'food_thiamin' },
-    { pattern: /riboflavin\s*[:\s]*([\d.]+)\s*mg/i, key: 'riboflavin', field: 'food_riboflavin' },
-    { pattern: /niacin\s*[:\s]*([\d.]+)\s*mg/i, key: 'niacin', field: 'food_niacin' },
-    { pattern: /vitamin\s*b-?6\s*[:\s]*([\d.]+)\s*mg/i, key: 'vitaminB6', field: 'food_vitaminB6' },
-    { pattern: /folate\s*[:\s]*([\d.]+)\s*mcg/i, key: 'folate', field: 'food_folate' },
-    { pattern: /vitamin\s*b-?12\s*[:\s]*([\d.]+)\s*mcg/i, key: 'vitaminB12', field: 'food_vitaminB12' },
-    { pattern: /phosphorus\s*[:\s]*([\d.]+)\s*mg/i, key: 'phosphorus', field: 'food_phosphorus' },
-    { pattern: /magnesium\s*[:\s]*([\d.]+)\s*mg/i, key: 'magnesium', field: 'food_magnesium' },
-    { pattern: /zinc\s*[:\s]*([\d.]+)\s*mg/i, key: 'zinc', field: 'food_zinc' }
+    { pattern: /ca[il1|]or[il1|]es\s*[:\s]*([\d,.]+)/i, key: 'calories', field: 'food_calories' },
+    { pattern: /tota[il1|]\s*fat\s*[:\s]*([\d,.]+)\s*g/i, key: 'fat', field: 'food_fat' },
+    { pattern: /saturated\s*fat\s*[:\s]*([\d,.]+)\s*g/i, key: 'saturatedFat', field: 'food_saturatedFat' },
+    { pattern: /trans\s*fat\s*[:\s]*([\d,.]+)\s*g/i, key: 'transFat', field: 'food_transFat' },
+    { pattern: /cho[il1|]estero[il1|]\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'cholesterol', field: 'food_cholesterol' },
+    { pattern: /sod[il1|]um\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'sodium', field: 'food_sodium' },
+    { pattern: /tota[il1|]\s*carb(?:ohydrate)?s?\s*[:\s]*([\d,.]+)\s*g/i, key: 'carbs', field: 'food_carbs' },
+    { pattern: /d[il1|]etary\s*f[il1|]ber\s*[:\s]*([\d,.]+)\s*g/i, key: 'fiber', field: 'food_fiber' },
+    { pattern: /tota[il1|]\s*sugars?\s*[:\s]*([\d,.]+)\s*g/i, key: 'sugars', field: 'food_sugars' },
+    { pattern: /(?:inc[il1|]\.?\s*)?added\s*sugars?\s*[:\s]*([\d,.]+)\s*g/i, key: 'addedSugars', field: 'food_addedSugars' },
+    { pattern: /prote[il1|]n\s*[:\s]*([\d,.]+)\s*g/i, key: 'protein', field: 'food_protein' },
+    { pattern: /v[il1|]tam[il1|]n\s*d\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'vitaminD', field: 'food_vitaminD' },
+    { pattern: /ca[il1|]c[il1|]um\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'calcium', field: 'food_calcium' },
+    { pattern: /[il1|]ron\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'iron', field: 'food_iron' },
+    { pattern: /potass[il1|]um\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'potassium', field: 'food_potassium' },
+    { pattern: /v[il1|]tam[il1|]n\s*a\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'vitaminA', field: 'food_vitaminA' },
+    { pattern: /v[il1|]tam[il1|]n\s*c\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'vitaminC', field: 'food_vitaminC' },
+    { pattern: /v[il1|]tam[il1|]n\s*e\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'vitaminE', field: 'food_vitaminE' },
+    { pattern: /v[il1|]tam[il1|]n\s*k\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'vitaminK', field: 'food_vitaminK' },
+    { pattern: /th[il1|]am[il1|]n\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'thiamin', field: 'food_thiamin' },
+    { pattern: /r[il1|]bof[il1|]av[il1|]n\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'riboflavin', field: 'food_riboflavin' },
+    { pattern: /n[il1|]ac[il1|]n\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'niacin', field: 'food_niacin' },
+    { pattern: /v[il1|]tam[il1|]n\s*b-?6\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'vitaminB6', field: 'food_vitaminB6' },
+    { pattern: /fo[il1|]ate\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'folate', field: 'food_folate' },
+    { pattern: /v[il1|]tam[il1|]n\s*b-?12\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'vitaminB12', field: 'food_vitaminB12' },
+    { pattern: /phosphorus\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'phosphorus', field: 'food_phosphorus' },
+    { pattern: /magnes[il1|]um\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'magnesium', field: 'food_magnesium' },
+    { pattern: /z[il1|]nc\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'zinc', field: 'food_zinc' }
 ];
 
-var SERVING_SIZE_PATTERN = /serving\s*size\s*[:\s]*([\d.\/]+)\s*([a-zA-Z()\/\s]+?)(?:\s*\([\d.]+\s*g\))?$/im;
+var SERVING_SIZE_PATTERN = /serv[il1|]ng\s*s[il1|]ze\s*[:\s]*([\d.\/]+)\s*([a-zA-Z()\/\s]+?)(?:\s*\([\d.]+\s*g\))?$/im;
 
 function initLabelReader() {
     var cameraBtn = document.getElementById('label_camera_btn');
@@ -68,7 +68,9 @@ function startCamera() {
     var video = document.getElementById('label_camera_video');
     cameraContainer.style.display = 'flex';
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+    })
         .then(function (stream) {
             labelStream = stream;
             video.srcObject = stream;
@@ -130,6 +132,35 @@ function handleFileUpload(e) {
     reader.readAsDataURL(file);
 }
 
+function preprocessImage(imageDataUrl, callback) {
+    var img = new Image();
+    img.onload = function () {
+        var canvas = document.createElement('canvas');
+        var scale = Math.max(1, 2000 / Math.max(img.width, img.height));
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        var ctx = canvas.getContext('2d');
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var data = imageData.data;
+
+        for (var i = 0; i < data.length; i += 4) {
+            var gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            var contrast = ((gray / 255 - 0.5) * 1.8 + 0.5) * 255;
+            var bw = contrast > 140 ? 255 : 0;
+            data[i] = bw;
+            data[i + 1] = bw;
+            data[i + 2] = bw;
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        callback(canvas.toDataURL('image/png'));
+    };
+    img.src = imageDataUrl;
+}
+
 function scanLabel() {
     if (!labelImageData) return;
     if (typeof Tesseract === 'undefined') {
@@ -141,32 +172,42 @@ function scanLabel() {
     loading.style.display = 'block';
     document.getElementById('label_scan_btn').style.display = 'none';
 
-    Tesseract.recognize(labelImageData, 'eng', {
-        logger: function () {}
-    }).then(function (result) {
-        loading.style.display = 'none';
-        var text = result.data.text;
-        var parsed = parseLabelText(text);
-        populateManualAddForm(parsed);
-    }).catch(function (err) {
-        loading.style.display = 'none';
-        console.error('OCR error:', err);
-        alert('Failed to scan the label. Please try again with a clearer image.');
-        document.getElementById('label_scan_btn').style.display = 'block';
+    preprocessImage(labelImageData, function (processedImage) {
+        Tesseract.recognize(processedImage, 'eng', {
+            logger: function () {}
+        }).then(function (result) {
+            loading.style.display = 'none';
+            var text = result.data.text;
+            console.log('OCR raw text:', text);
+            var parsed = parseLabelText(text);
+            populateManualAddForm(parsed);
+        }).catch(function (err) {
+            loading.style.display = 'none';
+            console.error('OCR error:', err);
+            alert('Failed to scan the label. Please try again with a clearer image.');
+            document.getElementById('label_scan_btn').style.display = 'block';
+        });
     });
 }
 
 function parseLabelText(text) {
     var results = {};
 
+    var cleaned = text
+        .replace(/[—–]/g, '-')
+        .replace(/[''`]/g, "'")
+        .replace(/[""]/g, '"')
+        .replace(/\r\n/g, '\n');
+
     for (var i = 0; i < LABEL_PATTERNS.length; i++) {
-        var match = text.match(LABEL_PATTERNS[i].pattern);
+        var match = cleaned.match(LABEL_PATTERNS[i].pattern);
         if (match) {
-            results[LABEL_PATTERNS[i].key] = parseFloat(match[1]);
+            var numStr = match[1].replace(/,/g, '');
+            results[LABEL_PATTERNS[i].key] = parseFloat(numStr);
         }
     }
 
-    var servingMatch = text.match(SERVING_SIZE_PATTERN);
+    var servingMatch = cleaned.match(SERVING_SIZE_PATTERN);
     if (servingMatch) {
         results.servingSize = servingMatch[1];
         results.servingUnit = servingMatch[2].trim();

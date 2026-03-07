@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles/todays_nutrition.css">
     <link rel="stylesheet" href="styles/main.css">
 
-    <title>Foods and Meals</title>
+    <title>Today's Nutrition</title>
 </head>
 
 <body>
@@ -25,17 +25,15 @@
                 <li><a href="how_to_use.html">How To Use</a></li>
                 <li><a href="foods_and_meals.html">Foods and Meals</a></li>
                 <li><a id="current" href="todays_nutrition.html">Today's Nutrition</a></li>
-
+                <li><a href="eating_regimens.html">Eating Regimens</a></li>
+                <li><a href="settings.html">Settings</a></li>
             </ul>
         </nav>
 
-
-
-
-
-
         <section id="daily_nutrition_log">
            <h2><span id="current_date"></span></h2>
+
+           <div id="regimen_display"></div>
 
         <form id="log_nutrition_form">
             <h3>Enter the number of servings for the food/meal you would like to log in today's nutrition:</h3>
@@ -54,14 +52,15 @@
             </div>
         </form>
 
-
-
            <div id="macros">
             <h2 id="cals">Calories: <span id="total_calories">0</span></h2>
             <h2 id="carbs">Carbs: <span id="total_carbs">0</span>g</h2>
             <h2 id="protein">Protein: <span id="total_protein">0</span>g</h2>
             <h2 id="fat">Fat: <span id="total_fat">0</span>g</h2>
            </div>
+
+           <div id="micro_totals_section" style="display:none;"></div>
+
            <div id="eaten_today"></div>
            <div id="reset_nutrition_container">
                <button id="reset_nutrition_btn" type="button">Reset Nutrition</button>
@@ -90,8 +89,8 @@
         <p>&copy; <span id="copyright"></span> Jason Ciampa</p>
     </footer>
 
+    <script src="scripts/main.js"></script>
     <script src="scripts/todays_nutrition.js"></script>
     <script src="scripts/nutrition_database.js"></script>
-    <script src="scripts/main.js"></script>
 </body>
 </html>

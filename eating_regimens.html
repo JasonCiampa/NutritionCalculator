@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="styles/eating_regimens.css">
+    <link rel="stylesheet" href="styles/main.css">
+
+    <title>Eating Regimens</title>
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="images/healthy_bowl.png" alt="Click Here to return to homepage" title="Click Here to return to homepage"></a>
+        <h2>Nutrition Calculator</h2>
+        <button id="show_nav_menu_button" data-visible="false"></button>
+    </header>
+
+    <main>
+        <nav id="navigation_menu" data-visible="false">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="how_to_use.html">How To Use</a></li>
+                <li><a href="foods_and_meals.html">Foods and Meals</a></li>
+                <li><a href="todays_nutrition.html">Today's Nutrition</a></li>
+                <li><a id="current" href="eating_regimens.html">Eating Regimens</a></li>
+                <li><a href="settings.html">Settings</a></li>
+            </ul>
+        </nav>
+
+        <section id="regimen_management">
+            <h3>Manage Regimens</h3>
+            <div id="regimen_action_buttons">
+                <button type="button" onclick="showAddRegimenForm()">Add a Regimen</button>
+            </div>
+
+            <form id="add_regimen_form" onsubmit="return false;">
+                <h3>Set your regimen's nutrition goals:</h3>
+                <h4><span class="error"></span></h4>
+                <p>Name: <input type="text" id="regimen_name" autocomplete="off"></p>
+                <p>Max Calories: <input type="number" id="regimen_max_calories" step="any" min="0" autocomplete="off"></p>
+                <p>Max Fat (g): <input type="number" id="regimen_max_fat" step="any" min="0" autocomplete="off"></p>
+                <p>Max Carbs (g): <input type="number" id="regimen_max_carbs" step="any" min="0" autocomplete="off"></p>
+                <p>Max Protein (g): <input type="number" id="regimen_max_protein" step="any" min="0" autocomplete="off"></p>
+
+                <div id="regimen_micro_goals" style="display:none;">
+                    <button type="button" id="regimen_micro_goals_toggle" onclick="toggleRegimenMicroGoals()">Micronutrient Goals (optional)</button>
+                    <div id="regimen_micro_goals_content"></div>
+                </div>
+
+                <div id="regimen_form_buttons">
+                    <button class="submit" type="button" onclick="submitRegimen()">Submit</button>
+                    <button class="quit" type="button" onclick="hideRegimenForm()">Quit</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="regimen_list_section">
+            <h3>Your Regimens</h3>
+            <div id="regimen_entries"></div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyright"></span> Jason Ciampa</p>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+    <script src="scripts/nutrition_database.js"></script>
+    <script src="scripts/eating_regimens.js"></script>
+</body>
+</html>

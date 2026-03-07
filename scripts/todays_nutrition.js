@@ -1,9 +1,222 @@
 let expandedEntries = new Set();
+var cachedEatenToday = [];
 
 function currentDate() {
     let d = new Date();
     const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     document.getElementById('current_date').innerHTML = (String(month[d.getMonth()]) + ' ' + String(d.getDate()) + ',' + ' ' + String(d.getFullYear()));
+}
+
+function renderRegimenDisplay() {
+    var container = document.getElementById('regimen_display');
+    if (!container) return;
+    container.innerHTML = '';
+
+    var request = openDatabase();
+    request.onsuccess = function () {
+        var db = request.result;
+        var tx = db.transaction("regimens", "readonly");
+        var store = tx.objectStore("regimens");
+        var getAll = store.getAll();
+
+        getAll.onsuccess = function () {
+            var regimens = getAll.result || [];
+            var activeRegimen = localStorage.getItem('activeRegimen') || '';
+
+            if (regimens.length === 0 && !activeRegimen) return;
+
+            var selectorDiv = document.createElement('div');
+            selectorDiv.id = 'regimen_selector';
+
+            var label = document.createElement('span');
+            label.textContent = 'Regimen: ';
+            label.style.fontWeight = 'bold';
+            selectorDiv.appendChild(label);
+
+            var select = document.createElement('select');
+            select.id = 'regimen_select';
+
+            var noneOpt = document.createElement('option');
+            noneOpt.value = '';
+            noneOpt.textContent = 'None';
+            select.appendChild(noneOpt);
+
+            for (var i = 0; i < regimens.length; i++) {
+                var opt = document.createElement('option');
+                opt.value = regimens[i].name;
+                opt.textContent = regimens[i].name;
+                if (regimens[i].name === activeRegimen) opt.selected = true;
+                select.appendChild(opt);
+            }
+
+            select.addEventListener('change', function () {
+                localStorage.setItem('activeRegimen', select.value);
+                updateMacroGoalDisplay();
+                renderMicroTotals();
+            });
+
+            selectorDiv.appendChild(select);
+
+            if (activeRegimen) {
+                var deactivateBtn = document.createElement('button');
+                deactivateBtn.id = 'deactivate_regimen_btn';
+                deactivateBtn.textContent = 'Deactivate';
+                deactivateBtn.addEventListener('click', function () {
+                    localStorage.setItem('activeRegimen', '');
+                    select.value = '';
+                    updateMacroGoalDisplay();
+                    renderMicroTotals();
+                });
+                selectorDiv.appendChild(deactivateBtn);
+            }
+
+            container.appendChild(selectorDiv);
+        };
+    };
+}
+
+function getActiveRegimenData(callback) {
+    var activeRegimen = localStorage.getItem('activeRegimen') || '';
+    if (!activeRegimen) { callback(null); return; }
+
+    var request = openDatabase();
+    request.onsuccess = function () {
+        var db = request.result;
+        var tx = db.transaction("regimens", "readonly");
+        var store = tx.objectStore("regimens");
+        var req = store.get(activeRegimen);
+        req.onsuccess = function () {
+            callback(req.result || null);
+        };
+    };
+}
+
+function updateMacroGoalDisplay() {
+    getActiveRegimenData(function (regimen) {
+        var calsEl = document.getElementById('total_calories');
+        var carbsEl = document.getElementById('total_carbs');
+        var proteinEl = document.getElementById('total_protein');
+        var fatEl = document.getElementById('total_fat');
+
+        var calsH2 = document.getElementById('cals');
+        var carbsH2 = document.getElementById('carbs');
+        var proteinH2 = document.getElementById('protein');
+        var fatH2 = document.getElementById('fat');
+
+        var currentCals = parseFloat(calsEl.textContent) || 0;
+        var currentCarbs = parseFloat(carbsEl.textContent) || 0;
+        var currentProtein = parseFloat(proteinEl.textContent) || 0;
+        var currentFat = parseFloat(fatEl.textContent) || 0;
+
+        if (regimen) {
+            calsH2.innerHTML = 'Calories: <span id="total_calories">' + formatNumber(currentCals) + '</span> / ' + formatNumber(regimen.maxCalories);
+            carbsH2.innerHTML = 'Carbs: <span id="total_carbs">' + formatNumber(currentCarbs) + '</span>g / ' + formatNumber(regimen.maxCarbs) + 'g';
+            proteinH2.innerHTML = 'Protein: <span id="total_protein">' + formatNumber(currentProtein) + '</span>g / ' + formatNumber(regimen.maxProtein) + 'g';
+            fatH2.innerHTML = 'Fat: <span id="total_fat">' + formatNumber(currentFat) + '</span>g / ' + formatNumber(regimen.maxFat) + 'g';
+
+            if (currentCals > regimen.maxCalories) calsH2.classList.add('over-limit');
+            else calsH2.classList.remove('over-limit');
+            if (currentCarbs > regimen.maxCarbs) carbsH2.classList.add('over-limit');
+            else carbsH2.classList.remove('over-limit');
+            if (currentProtein > regimen.maxProtein) proteinH2.classList.add('over-limit');
+            else proteinH2.classList.remove('over-limit');
+            if (currentFat > regimen.maxFat) fatH2.classList.add('over-limit');
+            else fatH2.classList.remove('over-limit');
+        } else {
+            calsH2.innerHTML = 'Calories: <span id="total_calories">' + formatNumber(currentCals) + '</span>';
+            carbsH2.innerHTML = 'Carbs: <span id="total_carbs">' + formatNumber(currentCarbs) + '</span>g';
+            proteinH2.innerHTML = 'Protein: <span id="total_protein">' + formatNumber(currentProtein) + '</span>g';
+            fatH2.innerHTML = 'Fat: <span id="total_fat">' + formatNumber(currentFat) + '</span>g';
+            calsH2.classList.remove('over-limit');
+            carbsH2.classList.remove('over-limit');
+            proteinH2.classList.remove('over-limit');
+            fatH2.classList.remove('over-limit');
+        }
+    });
+}
+
+function renderMicroTotals() {
+    var section = document.getElementById('micro_totals_section');
+    if (!section) return;
+    var enabledMicros = getEnabledMicronutrients();
+    if (enabledMicros.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    section.style.display = 'block';
+    section.innerHTML = '';
+
+    var toggleBtn = document.createElement('button');
+    toggleBtn.id = 'micro_totals_toggle';
+    toggleBtn.textContent = 'Micronutrient Totals';
+    var content = document.createElement('div');
+    content.id = 'micro_totals_content';
+
+    toggleBtn.addEventListener('click', function () {
+        content.classList.toggle('expanded');
+    });
+
+    section.appendChild(toggleBtn);
+
+    var entries = cachedEatenToday || [];
+
+    getActiveRegimenData(function (regimen) {
+        for (var i = 0; i < enabledMicros.length; i++) {
+            var mk = enabledMicros[i];
+            var def = getMicroDef(mk);
+            if (!def) continue;
+
+            var total = 0;
+            var hasMissing = false;
+            for (var j = 0; j < entries.length; j++) {
+                if (entries[j][mk] != null) {
+                    total += parseFloat(entries[j][mk]);
+                } else {
+                    hasMissing = true;
+                }
+            }
+            total = Math.round(total * 100) / 100;
+
+            var row = document.createElement('div');
+            row.className = 'micro-total-row';
+
+            var labelSpan = document.createElement('span');
+            labelSpan.className = 'micro-total-label';
+            labelSpan.textContent = def.label;
+            row.appendChild(labelSpan);
+
+            var rightDiv = document.createElement('div');
+            rightDiv.className = 'micro-total-right';
+
+            var valueSpan = document.createElement('span');
+            valueSpan.className = 'micro-total-value';
+            var maxKey = 'max' + mk.charAt(0).toUpperCase() + mk.slice(1);
+            if (regimen && regimen[maxKey] != null) {
+                valueSpan.textContent = formatNumber(total) + def.unit + ' / ' + formatNumber(regimen[maxKey]) + def.unit;
+                if (total > regimen[maxKey]) valueSpan.style.color = '#e74c3c';
+            } else {
+                valueSpan.textContent = formatNumber(total) + def.unit;
+            }
+            rightDiv.appendChild(valueSpan);
+
+            if (hasMissing && entries.length > 0) {
+                var warnIcon = document.createElement('span');
+                warnIcon.className = 'micro-warning-icon';
+                warnIcon.setAttribute('tabindex', '0');
+                warnIcon.innerHTML = '&#9888;';
+                var tooltip = document.createElement('span');
+                tooltip.className = 'micro-warning-tooltip';
+                tooltip.textContent = "Some foods eaten today don't have information for " + def.label + ", so this total may be inaccurate.";
+                warnIcon.appendChild(tooltip);
+                rightDiv.appendChild(warnIcon);
+            }
+
+            row.appendChild(rightDiv);
+            content.appendChild(row);
+        }
+
+        section.appendChild(content);
+    });
 }
 
 function uniformizeEntryBoxes() {
@@ -72,26 +285,31 @@ function setNutritionToday() {
                 const eatenToday = nutritionStore.get("eatenToday");
 
                 totalCals.onsuccess = function () {
-                    document.getElementById('total_calories').innerHTML = Math.round(totalCals.result.content * 100) / 100;
+                    document.getElementById('total_calories').innerHTML = formatNumber(totalCals.result.content);
                 }
                 totalCarbs.onsuccess = function () {
-                    document.getElementById('total_carbs').innerHTML = Math.round(totalCarbs.result.content * 100) / 100;
+                    document.getElementById('total_carbs').innerHTML = formatNumber(totalCarbs.result.content);
                 }
                 totalProtein.onsuccess = function () {
-                    document.getElementById('total_protein').innerHTML = Math.round(totalProtein.result.content * 100) / 100;
+                    document.getElementById('total_protein').innerHTML = formatNumber(totalProtein.result.content);
                 }
                 totalFat.onsuccess = function () {
-                    document.getElementById('total_fat').innerHTML = Math.round(totalFat.result.content * 100) / 100;
+                    document.getElementById('total_fat').innerHTML = formatNumber(totalFat.result.content);
                 }
                 eatenToday.onsuccess = function () {
+                    cachedEatenToday = eatenToday.result.content || [];
                     const container = document.getElementById('eaten_today');
                     container.innerHTML = "";
+                    var enabledMicros = getEnabledMicronutrients();
 
                     for (let i = 0; i < eatenToday.result.content.length; i++) {
                         const entry = eatenToday.result.content[i];
 
                         const box = document.createElement("div");
                         box.className = expandedEntries.has(i) ? "entry-box expanded" : "entry-box";
+
+                        var warningIcon = buildMicroWarningIcon(entry, enabledMicros);
+                        if (warningIcon) box.appendChild(warningIcon);
 
                         const title = document.createElement("span");
                         title.className = "entry-title";
@@ -112,23 +330,58 @@ function setNutritionToday() {
 
                         const calsLine = document.createElement("p");
                         calsLine.className = "entry-detail-cals";
-                        calsLine.textContent = "Calories: " + entry.cals;
+                        calsLine.textContent = "Calories: " + formatNumber(entry.cals);
                         details.appendChild(calsLine);
 
                         const carbsLine = document.createElement("p");
                         carbsLine.className = "entry-detail-carbs";
-                        carbsLine.textContent = "Carbs: " + entry.carbs + "g";
+                        carbsLine.textContent = "Carbs: " + formatNumber(entry.carbs) + "g";
                         details.appendChild(carbsLine);
 
                         const proteinLine = document.createElement("p");
                         proteinLine.className = "entry-detail-protein";
-                        proteinLine.textContent = "Protein: " + entry.protein + "g";
+                        proteinLine.textContent = "Protein: " + formatNumber(entry.protein) + "g";
                         details.appendChild(proteinLine);
 
                         const fatLine = document.createElement("p");
                         fatLine.className = "entry-detail-fat";
-                        fatLine.textContent = "Fat: " + entry.fat + "g";
+                        fatLine.textContent = "Fat: " + formatNumber(entry.fat) + "g";
                         details.appendChild(fatLine);
+
+                        if (enabledMicros.length > 0) {
+                            var hasMicroData = false;
+                            for (var mi = 0; mi < enabledMicros.length; mi++) {
+                                if (entry[enabledMicros[mi]] != null) { hasMicroData = true; break; }
+                            }
+                            if (hasMicroData) {
+                                var microContainer = document.createElement("div");
+                                microContainer.className = "entry-micro-container";
+                                var microToggle = document.createElement("button");
+                                microToggle.className = "entry-micro-toggle-btn";
+                                microToggle.textContent = "Micronutrients";
+                                var microContent = document.createElement("div");
+                                microContent.className = "entry-micro-content";
+                                microToggle.addEventListener("click", function (e) {
+                                    e.stopPropagation();
+                                    microContent.classList.toggle("expanded");
+                                });
+                                for (var mi = 0; mi < enabledMicros.length; mi++) {
+                                    var mk = enabledMicros[mi];
+                                    if (entry[mk] != null) {
+                                        var def = getMicroDef(mk);
+                                        if (def) {
+                                            var microLine = document.createElement("p");
+                                            microLine.className = "entry-detail-micro";
+                                            microLine.textContent = def.label + ": " + formatNumber(entry[mk]) + def.unit;
+                                            microContent.appendChild(microLine);
+                                        }
+                                    }
+                                }
+                                microContainer.appendChild(microToggle);
+                                microContainer.appendChild(microContent);
+                                details.appendChild(microContainer);
+                            }
+                        }
 
                         const removeBtn = document.createElement("button");
                         removeBtn.className = "entry-remove-btn";
@@ -163,6 +416,8 @@ function setNutritionToday() {
                     }
 
                     uniformizeEntryBoxes();
+                    updateMacroGoalDisplay();
+                    renderMicroTotals();
                 }
             }
             else {
@@ -308,6 +563,7 @@ function resetNutrition() {
 
 window.addEventListener("load", function() {
     currentDate();
+    renderRegimenDisplay();
     setNutritionToday();
     loadFoodsAndMeals();
 

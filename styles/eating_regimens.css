@@ -1,0 +1,375 @@
+/* Eating Regimens Page Styles */
+#regimen_management {
+    display: flex;
+    flex-direction: column;
+    padding: 2vh;
+    text-align: center;
+    border-bottom: 3px solid var(--color-border);
+    width: 100%;
+}
+
+#regimen_management h3 {
+    padding-bottom: 2vh;
+    font-weight: bold;
+}
+
+#regimen_action_buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2vh;
+    margin-bottom: 2vh;
+}
+
+#regimen_action_buttons button {
+    padding: 2vh 3vh;
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-primary);
+    transition: 300ms ease;
+    cursor: pointer;
+}
+
+#regimen_action_buttons button:hover {
+    background-color: var(--color-primary-dark);
+}
+
+/* Add/Edit Regimen Form */
+#add_regimen_form {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 3vh;
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 3px solid var(--color-primary-dark);
+    background-color: var(--color-accent);
+    transition: 300ms ease;
+    text-align: center;
+}
+
+#add_regimen_form p {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5vh 0;
+}
+
+#add_regimen_form input {
+    text-align: center;
+    padding: 0.5vh 0;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+#add_regimen_form .submit, #add_regimen_form .quit {
+    padding: 1vh;
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-accent-dark);
+    transition: 300ms ease;
+    cursor: pointer;
+}
+
+#add_regimen_form .submit:hover, #add_regimen_form .quit:hover {
+    background-color: var(--color-primary-dark);
+}
+
+#regimen_form_buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2vh;
+    margin-top: 1vh;
+}
+
+#regimen_micro_goals {
+    margin-top: 1vh;
+    margin-bottom: 2vh;
+}
+
+#regimen_micro_goals_toggle {
+    padding: 1vh 2vh;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
+#regimen_micro_goals_toggle:hover {
+    background-color: var(--color-primary-dark);
+}
+
+#regimen_micro_goals_content {
+    display: none;
+    flex-direction: column;
+    padding: 1vh 0;
+}
+
+#regimen_micro_goals_content.expanded {
+    display: flex;
+}
+
+/* View Regimens */
+#regimen_list_section {
+    display: flex;
+    flex-direction: column;
+    padding: 2vh;
+    text-align: center;
+    border-bottom: 3px solid var(--color-border);
+    width: 100%;
+}
+
+#regimen_list_section h3 {
+    padding-bottom: 2vh;
+    font-weight: bold;
+}
+
+#regimen_entries {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5vh;
+    width: 100%;
+    padding: 1vh 0;
+}
+
+.regimen-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2vh;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 300ms ease;
+    text-align: center;
+    min-width: 180px;
+}
+
+.regimen-box:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.regimen-box .entry-details {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1.5vh;
+    gap: 0.5vh;
+}
+
+.regimen-box.expanded .entry-details {
+    display: flex;
+}
+
+.regimen-box .regimen-detail {
+    font-weight: normal;
+    font-size: 90%;
+}
+
+.regimen-detail-cals {
+    color: var(--color-cals);
+}
+
+.regimen-detail-carbs {
+    color: var(--color-carbs);
+}
+
+.regimen-detail-protein {
+    color: var(--color-protein);
+}
+
+.regimen-detail-fat {
+    color: var(--color-fat);
+}
+
+/* Micronutrient Toggle on Regimen Boxes */
+.entry-micro-container {
+    width: 100%;
+    margin-top: 1vh;
+}
+
+.entry-micro-toggle-btn {
+    padding: 0.5vh 1.5vh;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-accent-dark);
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 80%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
+.entry-micro-toggle-btn:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.entry-micro-content {
+    display: none;
+    flex-direction: column;
+    gap: 0.3vh;
+    padding-top: 0.5vh;
+}
+
+.entry-micro-content.expanded {
+    display: flex;
+}
+
+.entry-detail-micro {
+    font-size: 90%;
+    font-weight: normal;
+}
+
+.regimen-active-badge {
+    display: inline-block;
+    padding: 0.3vh 1vh;
+    background-color: #27ae60;
+    color: white;
+    font-size: 75%;
+    border-radius: 3px;
+    margin-left: 0.5vh;
+    font-weight: bold;
+}
+
+.regimen-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1vh;
+    margin-top: 1vh;
+}
+
+.regimen-activate-btn {
+    padding: 0.6vh 1.5vh;
+    background-color: #27ae60;
+    color: white;
+    border: 1px solid #1e8449;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 85%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+.regimen-activate-btn:hover {
+    background-color: #1e8449;
+}
+
+.regimen-edit-btn {
+    padding: 0.6vh 1.5vh;
+    background-color: var(--color-accent-dark);
+    color: var(--color-text);
+    border: 1px solid var(--color-primary-dark);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 85%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+.regimen-edit-btn:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.regimen-delete-btn {
+    padding: 0.6vh 1.5vh;
+    background-color: #c0392b;
+    color: white;
+    border: 1px solid #922b21;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 85%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+.regimen-delete-btn:hover {
+    background-color: #922b21;
+}
+
+.regimen-deactivate-btn {
+    padding: 0.6vh 1.5vh;
+    background-color: #888;
+    color: white;
+    border: 1px solid #666;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 85%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+.regimen-deactivate-btn:hover {
+    background-color: #666;
+}
+
+.delete-confirm-panel {
+    margin-top: 1.5vh;
+    padding: 2vh;
+    border: 3px solid var(--color-primary-dark);
+    background-color: var(--color-accent);
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    text-align: center;
+}
+
+.delete-confirm-panel h4 {
+    margin-bottom: 1.5vh;
+    font-weight: bold;
+}
+
+.delete-confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2vh;
+}
+
+.delete-confirm-yes {
+    padding: 0.8vh 2vh;
+    background-color: #c0392b;
+    color: white;
+    border: 1px solid #922b21;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+.delete-confirm-yes:hover {
+    background-color: #922b21;
+}
+
+.delete-confirm-cancel {
+    padding: 0.8vh 2vh;
+    background-color: var(--color-accent-dark);
+    color: var(--color-text);
+    border: 1px solid var(--color-primary-dark);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+.delete-confirm-cancel:hover {
+    background-color: var(--color-primary-dark);
+}
+
+@media screen and (min-width: 280px) and (max-width: 767px) {
+    #regimen_action_buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}

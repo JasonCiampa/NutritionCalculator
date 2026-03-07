@@ -1,0 +1,218 @@
+/* Settings Page Styles */
+#settings_sections {
+    display: flex;
+    flex-direction: column;
+    padding: 2vh;
+    gap: 3vh;
+}
+
+.settings-section {
+    border: 3px solid var(--color-primary-dark);
+    background-color: var(--color-accent);
+    padding: 3vh;
+}
+
+.settings-section h3 {
+    text-align: center;
+    margin-bottom: 2vh;
+    font-size: 120%;
+}
+
+/* Color Scheme Swatches */
+#color_scheme_options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2vh;
+}
+
+.color-swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vh;
+    padding: 2vh;
+    border: 3px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 300ms ease;
+    min-width: 100px;
+}
+
+.color-swatch:hover {
+    transform: scale(1.05);
+}
+
+.color-swatch.active {
+    border-color: var(--color-text);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+}
+
+.swatch-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.swatch-label {
+    font-weight: bold;
+    font-size: 90%;
+    text-align: center;
+}
+
+/* Decimal Precision Options */
+#decimal_precision_options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5vh;
+}
+
+.decimal-option {
+    display: flex;
+    align-items: center;
+    gap: 0.8vh;
+    padding: 1vh 2vh;
+    background-color: var(--color-overlay-light);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 200ms ease;
+    user-select: none;
+}
+
+.decimal-option:hover {
+    background-color: var(--color-primary);
+}
+
+.decimal-option.active {
+    background-color: var(--color-primary);
+    border: 2px solid var(--color-text);
+}
+
+.decimal-option input[type="radio"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.decimal-option label {
+    cursor: pointer;
+    font-size: 90%;
+    white-space: nowrap;
+}
+
+/* Micronutrient Toggles */
+#micro_toggle_controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.5vh;
+    margin-bottom: 2vh;
+}
+
+#micro_toggle_controls button {
+    padding: 0.8vh 2vh;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-accent-dark);
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+#micro_toggle_controls button:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.micro-group {
+    margin-bottom: 2vh;
+}
+
+.micro-group h4 {
+    text-align: center;
+    margin-bottom: 1vh;
+    padding-bottom: 0.5vh;
+    border-bottom: 1px solid var(--color-overlay-light);
+}
+
+.micro-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1vh;
+}
+
+.micro-toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5vh;
+    padding: 0.5vh 1.5vh;
+    background-color: var(--color-overlay-light);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 200ms ease;
+    user-select: none;
+}
+
+.micro-toggle-item:hover {
+    background-color: var(--color-primary);
+}
+
+.micro-toggle-item input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.micro-toggle-item label {
+    cursor: pointer;
+    font-size: 90%;
+    white-space: nowrap;
+}
+
+/* Data Backup */
+#backup_buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2vh;
+}
+
+#backup_buttons button {
+    padding: 1.2vh 3vh;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-accent-dark);
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+    font-weight: bold;
+}
+
+#backup_buttons button:hover {
+    background-color: var(--color-primary-dark);
+}
+
+@media screen and (min-width: 280px) and (max-width: 767px) {
+    #color_scheme_options {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .color-swatch {
+        width: 80%;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .micro-toggles {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .micro-toggle-item {
+        width: 80%;
+        justify-content: center;
+    }
+}

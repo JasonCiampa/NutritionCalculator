@@ -92,24 +92,57 @@ async function listFoods(dataTypes, pageSize, pageNumber) {
     });
 }
 
+var USDA_NUTRIENT_MAP = {
+    "Energy": { key: "calories", matchUnit: "kcal" },
+    "Protein": { key: "protein" },
+    "Total lipid (fat)": { key: "fat" },
+    "Carbohydrate, by difference": { key: "carbs" },
+    "Fatty acids, total saturated": { key: "saturatedFat" },
+    "Fatty acids, total trans": { key: "transFat" },
+    "Cholesterol": { key: "cholesterol" },
+    "Sodium, Na": { key: "sodium" },
+    "Fiber, total dietary": { key: "fiber" },
+    "Total Sugars": { key: "sugars" },
+    "Sugars, total including NLEA": { key: "sugars" },
+    "Sugars, added": { key: "addedSugars" },
+    "Vitamin D (D2 + D3)": { key: "vitaminD" },
+    "Vitamin D (D2 + D3), International Units": { key: null },
+    "Calcium, Ca": { key: "calcium" },
+    "Iron, Fe": { key: "iron" },
+    "Potassium, K": { key: "potassium" },
+    "Vitamin A, RAE": { key: "vitaminA" },
+    "Vitamin A, IU": { key: null },
+    "Vitamin C, total ascorbic acid": { key: "vitaminC" },
+    "Vitamin E (alpha-tocopherol)": { key: "vitaminE" },
+    "Vitamin K (phylloquinone)": { key: "vitaminK" },
+    "Thiamin": { key: "thiamin" },
+    "Riboflavin": { key: "riboflavin" },
+    "Niacin": { key: "niacin" },
+    "Vitamin B-6": { key: "vitaminB6" },
+    "Folate, total": { key: "folate" },
+    "Folate, DFE": { key: "folate" },
+    "Vitamin B-12": { key: "vitaminB12" },
+    "Phosphorus, P": { key: "phosphorus" },
+    "Magnesium, Mg": { key: "magnesium" },
+    "Zinc, Zn": { key: "zinc" }
+};
+
 function extractNutrients(foodData) {
-    const nutrients = { calories: 0, protein: 0, fat: 0, carbs: 0 };
-    const list = foodData.foodNutrients || [];
+    var nutrients = { calories: 0, protein: 0, fat: 0, carbs: 0 };
+    var list = foodData.foodNutrients || [];
 
-    for (let i = 0; i < list.length; i++) {
-        const fn = list[i];
-        const name = (fn.nutrient && fn.nutrient.name) || fn.nutrientName || fn.name || "";
-        const unit = ((fn.nutrient && fn.nutrient.unitName) || fn.unitName || "").toLowerCase();
-        const amount = fn.amount != null ? fn.amount : (fn.value || 0);
+    for (var i = 0; i < list.length; i++) {
+        var fn = list[i];
+        var name = (fn.nutrient && fn.nutrient.name) || fn.nutrientName || fn.name || "";
+        var unit = ((fn.nutrient && fn.nutrient.unitName) || fn.unitName || "").toLowerCase();
+        var amount = fn.amount != null ? fn.amount : (fn.value || 0);
 
-        if (name === "Energy" && unit === "kcal") {
-            nutrients.calories = amount;
-        } else if (name === "Protein") {
-            nutrients.protein = amount;
-        } else if (name === "Total lipid (fat)") {
-            nutrients.fat = amount;
-        } else if (name === "Carbohydrate, by difference") {
-            nutrients.carbs = amount;
+        var mapping = USDA_NUTRIENT_MAP[name];
+        if (mapping && mapping.key) {
+            if (mapping.matchUnit && unit !== mapping.matchUnit) continue;
+            if (nutrients[mapping.key] === undefined || nutrients[mapping.key] === 0) {
+                nutrients[mapping.key] = amount;
+            }
         }
     }
 
@@ -233,12 +266,13 @@ function extractPortionsFromSearchResult(food) {
 function scaleNutrients(nutrientsPer100g, gramWeight) {
     if (!gramWeight || gramWeight <= 0) return nutrientsPer100g;
     var factor = gramWeight / 100;
-    return {
-        calories: nutrientsPer100g.calories * factor,
-        protein: nutrientsPer100g.protein * factor,
-        fat: nutrientsPer100g.fat * factor,
-        carbs: nutrientsPer100g.carbs * factor
-    };
+    var scaled = {};
+    for (var key in nutrientsPer100g) {
+        if (nutrientsPer100g.hasOwnProperty(key)) {
+            scaled[key] = nutrientsPer100g[key] * factor;
+        }
+    }
+    return scaled;
 }
 
 function parsePortionString(portionStr) {

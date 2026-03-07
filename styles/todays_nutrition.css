@@ -4,7 +4,7 @@
     flex-direction: column;
     padding: 2vh;
     text-align: center;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
     width: 100%
 }
 
@@ -20,17 +20,16 @@
 
 #daily_nutrition_buttons button, #log_nutrition_form button {
     padding: 2vh;
-    border: 3px solid darkblue;
-    color: white;
+    border: 1px solid var(--color-primary-dark);
+    color: var(--color-text);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
-    border: 1px solid darkblue;
-    background-color: rgb(0, 86, 198);
+    background-color: var(--color-primary);
     transition: 300ms ease;
 }
 
 #daily_nutrition_buttons button:hover, #log_nutrition_form button:hover, #foodButtons button:hover, #mealButtons button:hover {
-    background-color: darkblue;
+    background-color: var(--color-primary-dark);
     cursor: pointer;
 }
 
@@ -51,19 +50,20 @@
     align-items: center;
     justify-content: center;
     padding: 2vh;
-    border: 1px solid darkblue;
-    background-color: rgb(0, 86, 198);
-    color: white;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-primary);
+    color: var(--color-text);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
     font-weight: bold;
     cursor: pointer;
     transition: all 300ms ease;
     text-align: center;
+    position: relative;
 }
 
 .entry-box:hover {
-    background-color: darkblue;
+    background-color: var(--color-primary-dark);
 }
 
 .entry-title {
@@ -83,19 +83,59 @@
 }
 
 .entry-detail-cals {
-    color: maroon;
+    color: var(--color-cals);
 }
 
 .entry-detail-carbs {
-    color: orange;
+    color: var(--color-carbs);
 }
 
 .entry-detail-protein {
-    color: rgb(214, 185, 146);
+    color: var(--color-protein);
 }
 
 .entry-detail-fat {
-    color: rgb(0, 65, 0);
+    color: var(--color-fat);
+}
+
+/* Micronutrient Toggle on Entry Boxes */
+.entry-micro-container {
+    width: 100%;
+    margin-top: 1vh;
+}
+
+.entry-micro-toggle-btn {
+    padding: 0.5vh 1.5vh;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-accent-dark);
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 80%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
+.entry-micro-toggle-btn:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.entry-micro-content {
+    display: none;
+    flex-direction: column;
+    gap: 0.3vh;
+    padding-top: 0.5vh;
+}
+
+.entry-micro-content.expanded {
+    display: flex;
+}
+
+.entry-detail-micro {
+    font-size: 90%;
+    font-weight: normal;
 }
 
 .entry-remove-btn {
@@ -142,9 +182,9 @@
 #reset_nutrition_container .delete-confirm-panel {
     margin-top: 1.5vh;
     padding: 2vh;
-    border: 3px solid darkblue;
-    background-color: rgb(0, 110, 255);
-    color: white;
+    border: 3px solid var(--color-primary-dark);
+    background-color: var(--color-accent);
+    color: var(--color-text);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     text-align: center;
 }
@@ -177,9 +217,9 @@
 
 #reset_nutrition_container .delete-confirm-cancel {
     padding: 0.8vh 2vh;
-    background-color: rgb(0, 55, 255);
-    color: white;
-    border: 1px solid darkblue;
+    background-color: var(--color-accent-dark);
+    color: var(--color-text);
+    border: 1px solid var(--color-primary-dark);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 90%;
     cursor: pointer;
@@ -187,7 +227,7 @@
 }
 
 #reset_nutrition_container .delete-confirm-cancel:hover {
-    background-color: darkblue;
+    background-color: var(--color-primary-dark);
 }
 
 /* Search bar */
@@ -195,7 +235,7 @@
     display: flex;
     justify-content: center;
     padding: 2vh;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 #food_meal_search {
@@ -204,8 +244,10 @@
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
     text-align: center;
-    border: 2px solid darkblue;
+    border: 2px solid var(--color-primary-dark);
     border-radius: 5px;
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
 }
 
 /* Food/Meal button wrappers */
@@ -214,7 +256,7 @@
 }
 
 #daily_nutrition_buttons button:active {
-    background-color: rgb(0, 110, 255);
+    background-color: var(--color-accent);
 }
 
 /* Food and Meal Forms Styles */
@@ -232,12 +274,11 @@
     flex-direction: column;
     width: 100%;
     padding: 3vh;
-    border: 1px solid darkblue;
-    color: white;
+    color: var(--color-text);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
-    border: 3px solid darkblue;
-    background-color: rgb(0, 110, 255);
+    border: 3px solid var(--color-primary-dark);
+    background-color: var(--color-accent);
     transition: 300ms ease;
     justify-content: center;
     padding-top: 5vh;
@@ -266,32 +307,30 @@ input {
     display: none;
     flex-direction: column;
     padding: 3vh;
-    border: 1px solid darkblue;
-    color: white;
+    color: var(--color-text);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
-    border: 3px solid darkblue;
-    background-color: rgb(0, 110, 255);
+    border: 3px solid var(--color-primary-dark);
+    background-color: var(--color-accent);
     transition: 300ms ease;
 }
 
 #nutrition_log_forms .submit, .quit {
     padding: 1vh;
-    border: 3px solid darkblue;
-    color: white;
+    color: var(--color-text);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
-    border: 1px solid darkblue;
-    background-color: rgb(0, 55, 255);
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-accent-dark);
     transition: 300ms ease;
 }
 
 #nutrition_log_forms .submit:hover, .quit:hover {
-    background-color: darkblue;
+    background-color: var(--color-primary-dark);
 }
 
 #nutrition_log_forms .submit:active, .quit:active {
-    background-color: rgb(0, 110, 255);
+    background-color: var(--color-accent);
 }
 
 /* Daily Nutrition Log */
@@ -302,7 +341,7 @@ input {
     text-align: left;
     justify-content: center;
     align-items: center;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 #daily_nutrition_log #macros {
@@ -315,25 +354,182 @@ input {
 }
 
 #cals {
-    color: maroon;
+    color: var(--color-cals);
 }
 
 #carbs {
-    color: orange;
+    color: var(--color-carbs);
 }
 
 #protein {
-    color: rgb(214, 185, 146);
+    color: var(--color-protein);
 }
 
 #fat {
-    color: rgb(0, 65, 0);
+    color: var(--color-fat);
 }
 
 #current_date {
-    color: rgb(0, 38, 255);
+    color: var(--color-date);
 }
 
+/* Regimen Display */
+#regimen_display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1vh 2vh;
+    width: 100%;
+}
+
+#regimen_display h3 {
+    margin-bottom: 1vh;
+}
+
+#regimen_selector {
+    display: flex;
+    align-items: center;
+    gap: 1vh;
+    margin-bottom: 1vh;
+}
+
+#regimen_select {
+    padding: 0.8vh 1.5vh;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    border: 2px solid var(--color-primary-dark);
+    border-radius: 5px;
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
+}
+
+#deactivate_regimen_btn {
+    padding: 0.6vh 1.5vh;
+    border: 1px solid #922b21;
+    background-color: #c0392b;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 80%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+}
+
+#deactivate_regimen_btn:hover {
+    background-color: #922b21;
+}
+
+/* Macro goal display */
+.macro-goal {
+    transition: color 300ms ease;
+}
+
+.macro-goal.over-limit {
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+}
+
+/* Micronutrient Totals */
+#micro_totals_section {
+    width: 100%;
+    padding: 1vh 2vh;
+    border-top: 2px solid var(--color-border);
+}
+
+#micro_totals_toggle {
+    padding: 1vh 2vh;
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
+#micro_totals_toggle:hover {
+    background-color: var(--color-primary-dark);
+}
+
+#micro_totals_content {
+    display: none;
+    flex-direction: column;
+    gap: 0.5vh;
+    padding: 1vh 0;
+}
+
+#micro_totals_content.expanded {
+    display: flex;
+}
+
+.micro-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5vh 1vh;
+    border-bottom: 1px solid var(--color-overlay-light);
+}
+
+.micro-total-label {
+    font-weight: bold;
+    font-size: 90%;
+}
+
+.micro-total-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5vh;
+}
+
+.micro-total-value {
+    font-size: 90%;
+    text-align: right;
+}
+
+/* Warning Icons */
+.micro-warning-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+    color: #f39c12;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.entry-box .micro-warning-icon {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+}
+
+.micro-warning-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 0.8vh 1.2vh;
+    border-radius: 4px;
+    font-size: 75%;
+    font-weight: normal;
+    white-space: normal;
+    width: 220px;
+    z-index: 100;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.micro-warning-icon:hover .micro-warning-tooltip,
+.micro-warning-icon:focus .micro-warning-tooltip {
+    display: block;
+}
 
 @media screen and (min-width: 280px) and (max-width: 767px) {
     #daily_nutrition_buttons {
@@ -352,6 +548,10 @@ input {
         justify-content: space-evenly;
         align-items: center;
     }
+
+    #regimen_selector {
+        flex-direction: column;
+    }
 }
 
 @media screen and (max-width: 446px) {
@@ -367,7 +567,7 @@ input {
 #food_and_meal_lists {
     display: flex;
     justify-content: space-evenly;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 #food_list, #meal_list {
@@ -389,11 +589,10 @@ input {
 
 #foodButtons button, #mealButtons button {
     padding: 2vh 7vh 2vh 7vh;
-    border: 3px solid darkblue;
-    color: white;
+    color: var(--color-text);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
-    border: 1px solid darkblue;
-    background-color: rgb(0, 86, 198);
+    border: 1px solid var(--color-primary-dark);
+    background-color: var(--color-primary);
     transition: 300ms ease; 
 }

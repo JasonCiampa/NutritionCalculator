@@ -662,6 +662,23 @@ function autoFillFoodForm(foodName, nutrients, portion) {
         document.getElementById("food_serving_size").value = "1";
         document.getElementById("food_measurement_unit").value = "serving";
     }
+
+    if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined' && typeof getEnabledMicronutrients === 'function') {
+        if (typeof renderMicroFieldsInForm === 'function') renderMicroFieldsInForm();
+        var enabled = getEnabledMicronutrients();
+        for (var i = 0; i < enabled.length; i++) {
+            var key = enabled[i];
+            var el = document.getElementById('food_' + key);
+            if (el && nutrients[key] != null) {
+                el.value = Math.round(nutrients[key] * 100) / 100;
+            }
+        }
+        var section = document.getElementById('micro_fields_section');
+        if (section && enabled.length > 0) {
+            var content = document.getElementById('micro_fields_content');
+            if (content) content.classList.add('expanded');
+        }
+    }
 }
 
 // --- UI Helpers ---

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="styles/settings.css">
+    <link rel="stylesheet" href="styles/main.css">
+
+    <title>Settings</title>
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="images/healthy_bowl.png" alt="Click Here to return to homepage" title="Click Here to return to homepage"></a>
+        <h2>Nutrition Calculator</h2>
+        <button id="show_nav_menu_button" data-visible="false"></button>
+    </header>
+
+    <main>
+        <nav id="navigation_menu" data-visible="false">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="how_to_use.html">How To Use</a></li>
+                <li><a href="foods_and_meals.html">Foods and Meals</a></li>
+                <li><a href="todays_nutrition.html">Today's Nutrition</a></li>
+                <li><a href="eating_regimens.html">Eating Regimens</a></li>
+                <li><a id="current" href="settings.html">Settings</a></li>
+            </ul>
+        </nav>
+
+        <div id="settings_sections">
+            <section class="settings-section">
+                <h3>Color Scheme</h3>
+                <div id="color_scheme_options"></div>
+            </section>
+
+            <section class="settings-section">
+                <h3>Number Display</h3>
+                <p style="text-align:center; margin-bottom: 1vh;">Choose how many decimal places to show for nutrition totals.</p>
+                <div id="decimal_precision_options"></div>
+            </section>
+
+            <section class="settings-section">
+                <h3>Micronutrient Tracking</h3>
+                <p style="text-align:center; margin-bottom: 1vh;">Enable micronutrients below to track them in your foods, meals, and daily nutrition.</p>
+                <div id="micro_toggle_controls">
+                    <button type="button" onclick="selectAllMicros()">Select All</button>
+                    <button type="button" onclick="deselectAllMicros()">Deselect All</button>
+                </div>
+                <div id="micro_toggle_list"></div>
+            </section>
+
+            <section class="settings-section">
+                <h3>Data Backup</h3>
+                <p style="text-align:center; margin-bottom: 1vh;">Export your data to a backup file, or import a previously exported backup.</p>
+                <div id="backup_last_export"></div>
+                <div id="backup_buttons">
+                    <button type="button" id="export_data_btn">Export Data</button>
+                    <button type="button" id="import_data_btn">Import Data</button>
+                </div>
+                <input type="file" id="import_file_input" accept=".json" style="display:none;">
+                <div id="backup_status"></div>
+            </section>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyright"></span> Jason Ciampa</p>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+    <script src="scripts/nutrition_database.js"></script>
+    <script src="scripts/settings.js"></script>
+</body>
+</html>

@@ -85,6 +85,38 @@ function showAddFoodChoice() {
     displayForm(choice);
 }
 
+function renderMicroFieldsInForm() {
+    var container = document.getElementById('micro_fields_content');
+    var section = document.getElementById('micro_fields_section');
+    if (!container || !section) return;
+    container.innerHTML = '';
+    var enabled = getEnabledMicronutrients();
+    if (enabled.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    section.style.display = 'block';
+    for (var i = 0; i < enabled.length; i++) {
+        var def = getMicroDef(enabled[i]);
+        if (!def) continue;
+        var p = document.createElement('p');
+        p.textContent = def.label + ' (' + def.unit + '): ';
+        var input = document.createElement('input');
+        input.type = 'number';
+        input.id = 'food_' + def.key;
+        input.step = 'any';
+        input.min = '0';
+        input.autocomplete = 'off';
+        p.appendChild(input);
+        container.appendChild(p);
+    }
+}
+
+function toggleMicroFields() {
+    var content = document.getElementById('micro_fields_content');
+    if (content) content.classList.toggle('expanded');
+}
+
 function editFood(data) {
     displayForm(addFoodForm);
     editingItem = { type: 'food', originalName: data.name };
@@ -95,6 +127,12 @@ function editFood(data) {
     document.getElementById('food_carbs').value = data.carbs;
     document.getElementById('food_protein').value = data.protein;
     document.getElementById('food_fat').value = data.fat;
+    renderMicroFieldsInForm();
+    var enabled = getEnabledMicronutrients();
+    for (var i = 0; i < enabled.length; i++) {
+        var el = document.getElementById('food_' + enabled[i]);
+        if (el && data[enabled[i]] != null) el.value = data[enabled[i]];
+    }
 }
 
 function editMeal(data) {
@@ -155,23 +193,62 @@ function renderNutritionViewer() {
 
         const calsLine = document.createElement("p");
         calsLine.className = "entry-detail-cals";
-        calsLine.textContent = "Calories: " + data.cals;
+        calsLine.textContent = "Calories: " + formatNumber(data.cals);
         details.appendChild(calsLine);
 
         const carbsLine = document.createElement("p");
         carbsLine.className = "entry-detail-carbs";
-        carbsLine.textContent = "Carbs: " + data.carbs + "g";
+        carbsLine.textContent = "Carbs: " + formatNumber(data.carbs) + "g";
         details.appendChild(carbsLine);
 
         const proteinLine = document.createElement("p");
         proteinLine.className = "entry-detail-protein";
-        proteinLine.textContent = "Protein: " + data.protein + "g";
+        proteinLine.textContent = "Protein: " + formatNumber(data.protein) + "g";
         details.appendChild(proteinLine);
 
         const fatLine = document.createElement("p");
         fatLine.className = "entry-detail-fat";
-        fatLine.textContent = "Fat: " + data.fat + "g";
+        fatLine.textContent = "Fat: " + formatNumber(data.fat) + "g";
         details.appendChild(fatLine);
+
+        var enabledMicros = getEnabledMicronutrients();
+        if (enabledMicros.length > 0) {
+            var hasMicroData = false;
+            for (var mi = 0; mi < enabledMicros.length; mi++) {
+                if (data[enabledMicros[mi]] != null) { hasMicroData = true; break; }
+            }
+            if (hasMicroData) {
+                var microContainer = document.createElement("div");
+                microContainer.className = "entry-micro-container";
+                var microToggle = document.createElement("button");
+                microToggle.className = "entry-micro-toggle-btn";
+                microToggle.textContent = "Micronutrients";
+                var microContent = document.createElement("div");
+                microContent.className = "entry-micro-content";
+                microToggle.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    microContent.classList.toggle("expanded");
+                });
+                for (var mi = 0; mi < enabledMicros.length; mi++) {
+                    var mk = enabledMicros[mi];
+                    if (data[mk] != null) {
+                        var def = getMicroDef(mk);
+                        if (def) {
+                            var microLine = document.createElement("p");
+                            microLine.className = "entry-detail-micro";
+                            microLine.textContent = def.label + ": " + formatNumber(data[mk]) + def.unit;
+                            microContent.appendChild(microLine);
+                        }
+                    }
+                }
+                microContainer.appendChild(microToggle);
+                microContainer.appendChild(microContent);
+                details.appendChild(microContainer);
+            }
+        }
+
+        var warningIcon = buildMicroWarningIcon(data, enabledMicros);
+        if (warningIcon) box.appendChild(warningIcon);
 
         const actionRow = document.createElement("div");
         actionRow.className = "entry-action-buttons";
@@ -257,6 +334,7 @@ function toggleViewItem(itemData) {
 }
 
 function deleteItemFromDatabase(name, type) {
+    markDataModified();
     const request = openDatabase();
     request.onsuccess = function () {
         const db = request.result;
@@ -306,6 +384,8 @@ function deleteItemFromDatabase(name, type) {
                     for (let p = 0; p < mealsToProcess.length; p++) {
                         const mp = mealsToProcess[p];
                         let newCals = 0, newCarbs = 0, newProtein = 0, newFat = 0;
+                        let newMicros = {};
+                        let microMissingCount = {};
                         let ingredientsDone = 0;
 
                         for (let i = 0; i < mp.ingredients.length; i++) {
@@ -316,30 +396,49 @@ function deleteItemFromDatabase(name, type) {
                                     newCarbs += parseFloat(foodReq.result.carbs) * parseFloat(mp.servings[i]);
                                     newProtein += parseFloat(foodReq.result.protein) * parseFloat(mp.servings[i]);
                                     newFat += parseFloat(foodReq.result.fat) * parseFloat(mp.servings[i]);
+                                    if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                                        for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                            var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                            if (foodReq.result[mk] != null) {
+                                                newMicros[mk] = (newMicros[mk] || 0) + parseFloat(foodReq.result[mk]) * parseFloat(mp.servings[i]);
+                                            } else {
+                                                microMissingCount[mk] = (microMissingCount[mk] || 0) + 1;
+                                            }
+                                        }
+                                    }
                                 }
                                 ingredientsDone++;
                                 if (ingredientsDone === mp.ingredients.length) {
-                                    mealStore.put({
+                                    var missingMicros = [];
+                                    if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                                        for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                            var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                            if (microMissingCount[mk] > 0) {
+                                                missingMicros.push(mk);
+                                            }
+                                        }
+                                    }
+                                    var mealRecord = {
                                         name: mp.name,
                                         ingredient_list: mp.ingredients,
                                         serving_list: mp.servings,
                                         cals: Math.round(newCals * 100) / 100,
                                         carbs: Math.round(newCarbs * 100) / 100,
                                         protein: Math.round(newProtein * 100) / 100,
-                                        fat: Math.round(newFat * 100) / 100
-                                    });
+                                        fat: Math.round(newFat * 100) / 100,
+                                        _missingMicros: missingMicros
+                                    };
+                                    for (var mk in newMicros) {
+                                        if (newMicros.hasOwnProperty(mk)) {
+                                            mealRecord[mk] = Math.round(newMicros[mk] * 100) / 100;
+                                        }
+                                    }
+                                    mealStore.put(mealRecord);
 
                                     if (viewedItems.has("meal:" + mp.name)) {
-                                        viewedItems.set("meal:" + mp.name, {
-                                            name: mp.name,
-                                            type: "meal",
-                                            ingredient_list: mp.ingredients,
-                                            serving_list: mp.servings,
-                                            cals: Math.round(newCals * 100) / 100,
-                                            carbs: Math.round(newCarbs * 100) / 100,
-                                            protein: Math.round(newProtein * 100) / 100,
-                                            fat: Math.round(newFat * 100) / 100
-                                        });
+                                        var viewRecord = JSON.parse(JSON.stringify(mealRecord));
+                                        viewRecord.type = "meal";
+                                        viewedItems.set("meal:" + mp.name, viewRecord);
                                     }
                                 }
                             };
@@ -538,6 +637,8 @@ function cascadeFoodEditToMeals(foodName, db, onComplete) {
         for (let p = 0; p < mealsToRecalc.length; p++) {
             const meal = mealsToRecalc[p];
             let newCals = 0, newCarbs = 0, newProtein = 0, newFat = 0;
+            let newMicros = {};
+            let microMissingCount = {};
             let ingredientsDone = 0;
 
             for (let i = 0; i < meal.ingredient_list.length; i++) {
@@ -548,29 +649,48 @@ function cascadeFoodEditToMeals(foodName, db, onComplete) {
                         newCarbs += parseFloat(foodReq.result.carbs) * parseFloat(meal.serving_list[i]);
                         newProtein += parseFloat(foodReq.result.protein) * parseFloat(meal.serving_list[i]);
                         newFat += parseFloat(foodReq.result.fat) * parseFloat(meal.serving_list[i]);
+                        if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                            for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                if (foodReq.result[mk] != null) {
+                                    newMicros[mk] = (newMicros[mk] || 0) + parseFloat(foodReq.result[mk]) * parseFloat(meal.serving_list[i]);
+                                } else {
+                                    microMissingCount[mk] = (microMissingCount[mk] || 0) + 1;
+                                }
+                            }
+                        }
                     }
                     ingredientsDone++;
                     if (ingredientsDone === meal.ingredient_list.length) {
-                        mealStore.put({
+                        var missingMicros = [];
+                        if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                            for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                if (microMissingCount[mk] > 0) {
+                                    missingMicros.push(mk);
+                                }
+                            }
+                        }
+                        var mealRecord = {
                             name: meal.name,
                             ingredient_list: meal.ingredient_list,
                             serving_list: meal.serving_list,
                             cals: Math.round(newCals * 100) / 100,
                             carbs: Math.round(newCarbs * 100) / 100,
                             protein: Math.round(newProtein * 100) / 100,
-                            fat: Math.round(newFat * 100) / 100
-                        });
+                            fat: Math.round(newFat * 100) / 100,
+                            _missingMicros: missingMicros
+                        };
+                        for (var mk in newMicros) {
+                            if (newMicros.hasOwnProperty(mk)) {
+                                mealRecord[mk] = Math.round(newMicros[mk] * 100) / 100;
+                            }
+                        }
+                        mealStore.put(mealRecord);
                         if (viewedItems.has("meal:" + meal.name)) {
-                            viewedItems.set("meal:" + meal.name, {
-                                name: meal.name,
-                                type: "meal",
-                                ingredient_list: meal.ingredient_list,
-                                serving_list: meal.serving_list,
-                                cals: Math.round(newCals * 100) / 100,
-                                carbs: Math.round(newCarbs * 100) / 100,
-                                protein: Math.round(newProtein * 100) / 100,
-                                fat: Math.round(newFat * 100) / 100
-                            });
+                            var viewRecord = JSON.parse(JSON.stringify(mealRecord));
+                            viewRecord.type = "meal";
+                            viewedItems.set("meal:" + meal.name, viewRecord);
                         }
                     }
                 };
@@ -643,6 +763,14 @@ function updateTodaysNutritionAfterEdit(affectedNames, db, onComplete) {
                         entries[entryIndex].fat = Math.round(parseFloat(foodReq.result.fat) * entry.servings * 100) / 100;
                         entries[entryIndex].servingSize = foodReq.result.serving_size;
                         entries[entryIndex].measurementUnit = foodReq.result.measurement_unit;
+                        if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                            for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                entries[entryIndex][mk] = foodReq.result[mk] != null
+                                    ? Math.round(parseFloat(foodReq.result[mk]) * entry.servings * 100) / 100
+                                    : undefined;
+                            }
+                        }
                     }
                     checkAllDone();
                 };
@@ -659,6 +787,16 @@ function updateTodaysNutritionAfterEdit(affectedNames, db, onComplete) {
                             ingredientStrings.push(mealReq.result.serving_list[j] + "x " + mealReq.result.ingredient_list[j]);
                         }
                         entries[entryIndex].ingredients = ingredientStrings;
+                        entries[entryIndex].ingredient_list = mealReq.result.ingredient_list;
+                        entries[entryIndex]._missingMicros = mealReq.result._missingMicros || [];
+                        if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                            for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                entries[entryIndex][mk] = mealReq.result[mk] != null
+                                    ? Math.round(parseFloat(mealReq.result[mk]) * entry.servings * 100) / 100
+                                    : undefined;
+                            }
+                        }
                     }
                     checkAllDone();
                 };
@@ -702,20 +840,34 @@ function setNutritionLists() {
                 const button = document.createElement("button");
                 button.innerHTML = food.name;
 
-                button.onclick = () => {
-                    toggleViewItem({
-                        name: food.name,
-                        type: "food",
-                        serving_size: food.serving_size,
-                        measurement_unit: food.measurement_unit,
-                        cals: food.cals,
-                        carbs: food.carbs,
-                        protein: food.protein,
-                        fat: food.fat
-                    });
+                var foodData = {
+                    name: food.name,
+                    type: "food",
+                    serving_size: food.serving_size,
+                    measurement_unit: food.measurement_unit,
+                    cals: food.cals,
+                    carbs: food.carbs,
+                    protein: food.protein,
+                    fat: food.fat
                 };
+                if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                    for (var mi = 0; mi < MICRONUTRIENT_DEFINITIONS.length; mi++) {
+                        var mk = MICRONUTRIENT_DEFINITIONS[mi].key;
+                        if (food[mk] != null) foodData[mk] = food[mk];
+                    }
+                }
+
+                button.onclick = (function(fd) { return function() { toggleViewItem(fd); }; })(foodData);
 
                 wrapper.appendChild(button);
+
+                var enabledMicros = getEnabledMicronutrients();
+                var wIcon = buildMicroWarningIcon(food, enabledMicros);
+                if (wIcon) {
+                    wrapper.style.position = 'relative';
+                    wrapper.appendChild(wIcon);
+                }
+
                 foodButtons.appendChild(wrapper);
             }
 
@@ -744,20 +896,35 @@ function setNutritionLists() {
                 button.innerHTML = meal.name;
                 button.dataset.ingredients = meal.ingredient_list.join(",");
 
-                button.onclick = () => {
-                    toggleViewItem({
-                        name: meal.name,
-                        type: "meal",
-                        ingredient_list: meal.ingredient_list,
-                        serving_list: meal.serving_list,
-                        cals: meal.cals,
-                        carbs: meal.carbs,
-                        protein: meal.protein,
-                        fat: meal.fat
-                    });
+                var mealData = {
+                    name: meal.name,
+                    type: "meal",
+                    ingredient_list: meal.ingredient_list,
+                    serving_list: meal.serving_list,
+                    cals: meal.cals,
+                    carbs: meal.carbs,
+                    protein: meal.protein,
+                    fat: meal.fat,
+                    _missingMicros: meal._missingMicros || []
                 };
+                if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                    for (var mi = 0; mi < MICRONUTRIENT_DEFINITIONS.length; mi++) {
+                        var mk = MICRONUTRIENT_DEFINITIONS[mi].key;
+                        if (meal[mk] != null) mealData[mk] = meal[mk];
+                    }
+                }
+
+                button.onclick = (function(md) { return function() { toggleViewItem(md); }; })(mealData);
 
                 wrapper.appendChild(button);
+
+                var enabledMicros = getEnabledMicronutrients();
+                var wIcon = buildMicroWarningIcon(meal, enabledMicros);
+                if (wIcon) {
+                    wrapper.style.position = 'relative';
+                    wrapper.appendChild(wIcon);
+                }
+
                 mealButtons.appendChild(wrapper);
             }
 
@@ -785,6 +952,7 @@ window.addEventListener("load", function () {
 
     document.getElementById('manual_add_btn').addEventListener("click", function () {
         document.getElementById('add_food_choice').style.display = 'none';
+        renderMicroFieldsInForm();
         displayForm(addFoodForm);
     });
 
@@ -797,6 +965,12 @@ window.addEventListener("load", function () {
     document.getElementById('add_food_choice_quit').addEventListener("click", function () {
         document.getElementById('add_food_choice').style.display = 'none';
         openedFile = '';
+    });
+
+    document.getElementById('scan_label_btn').addEventListener("click", function () {
+        document.getElementById('add_food_choice').style.display = 'none';
+        var scanForm = document.getElementById('scan_label_form');
+        displayForm(scanForm);
     });
 
     if (typeof initAutoAdd === "function") {

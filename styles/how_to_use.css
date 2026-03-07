@@ -7,13 +7,13 @@ main h2 {
 
 main #foods_and_meals {
     padding: 0 3vh;
-    color: rgb(0, 51, 255);
+    color: var(--color-heading);
 }
 
 #foods_and_meals_info {
     display: flex;
     padding-bottom: 5vh;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 #foods_and_meals_info #foods_and_meals_text {
@@ -30,14 +30,14 @@ main #foods_and_meals {
 main #todays_nutrition {
     padding: 5vh 3vh 0 0;
     text-align: right;
-    color: rgb(0, 51, 255);
+    color: var(--color-heading);
 }
 
 #todays_nutrition_info {
     display: flex;
     flex-direction: row-reverse;
     padding-bottom: 5vh;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 #todays_nutrition_info #todays_nutrition_text {

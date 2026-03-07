@@ -20,19 +20,27 @@ function openDatabase() {
         return
     }
 
-    const request = indexedDB.open("FoodMealDatabase", 1);
+    const request = indexedDB.open("FoodMealDatabase", 2);
 
     request.onerror = function (event) {
         console.error("An error occurred with IndexedDB");
         console.error(event);
     };
 
-    request.onupgradeneeded = function () {
+    request.onupgradeneeded = function (event) {
         const db = request.result;
-
-        const foodStore = db.createObjectStore("foods", { keyPath: "name" });
-        const mealStore = db.createObjectStore("meals", { keyPath: "name" });
-        const nutritionStore = db.createObjectStore("nutrition", { keyPath: "name" });
+        if (!db.objectStoreNames.contains("foods")) {
+            db.createObjectStore("foods", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("meals")) {
+            db.createObjectStore("meals", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("nutrition")) {
+            db.createObjectStore("nutrition", { keyPath: "name" });
+        }
+        if (!db.objectStoreNames.contains("regimens")) {
+            db.createObjectStore("regimens", { keyPath: "name" });
+        }
     };
 
     return request;
@@ -42,7 +50,7 @@ function openDatabase() {
 
 // FOOD CLASS
 class Food {
-    constructor(name, measurement_unit, serving_size, cals, carbs, protein, fat) {
+    constructor(name, measurement_unit, serving_size, cals, carbs, protein, fat, micros) {
         this.name = name;
         this.measurement_unit = measurement_unit;
         this.serving_size = serving_size;
@@ -50,12 +58,17 @@ class Food {
         this.carbs = carbs;
         this.protein = protein;
         this.fat = fat;
+        if (micros) {
+            for (var k in micros) {
+                if (micros.hasOwnProperty(k)) this[k] = micros[k];
+            }
+        }
     }
 }
 
 // MEAL CLASS
 class Meal {
-    constructor(name, ingredient_list, serving_list, cals, carbs, protein, fat) {
+    constructor(name, ingredient_list, serving_list, cals, carbs, protein, fat, micros) {
         this.name = name;
         this.ingredient_list = ingredient_list;
         this.serving_list = serving_list;
@@ -63,7 +76,47 @@ class Meal {
         this.carbs = carbs;
         this.protein = protein;
         this.fat = fat;
+        if (micros) {
+            for (var k in micros) {
+                if (micros.hasOwnProperty(k)) this[k] = micros[k];
+            }
+        }
     }
+}
+
+function collectMicroFieldValues() {
+    var micros = {};
+    if (typeof MICRONUTRIENT_DEFINITIONS === 'undefined') return micros;
+    for (var i = 0; i < MICRONUTRIENT_DEFINITIONS.length; i++) {
+        var key = MICRONUTRIENT_DEFINITIONS[i].key;
+        var el = document.getElementById('food_' + key);
+        if (el && el.value !== '') {
+            micros[key] = parseFloat(el.value);
+        }
+    }
+    return micros;
+}
+
+function clearMicroFields() {
+    if (typeof MICRONUTRIENT_DEFINITIONS === 'undefined') return;
+    for (var i = 0; i < MICRONUTRIENT_DEFINITIONS.length; i++) {
+        var el = document.getElementById('food_' + MICRONUTRIENT_DEFINITIONS[i].key);
+        if (el) el.value = '';
+    }
+}
+
+function buildFoodRecord(food, micros) {
+    var record = {
+        name: food.name, measurement_unit: food.measurement_unit,
+        serving_size: food.serving_size, cals: food.cals,
+        carbs: food.carbs, protein: food.protein, fat: food.fat
+    };
+    if (micros) {
+        for (var k in micros) {
+            if (micros.hasOwnProperty(k)) record[k] = micros[k];
+        }
+    }
+    return record;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,6 +182,10 @@ function closeForm(form) {
     }
     if (form.id === 'auto_add_food_form' && typeof resetAutoAddState === 'function') {
         resetAutoAddState();
+    }
+    if (form.id === 'add_food_form' && typeof removeScanAgainButton === 'function') {
+        removeScanAgainButton();
+        if (typeof labelScanActive !== 'undefined') labelScanActive = false;
     }
     if (typeof editingItem !== 'undefined' && editingItem) {
         editingItem = null;
@@ -261,7 +318,8 @@ function processForm(form) {
             }
         }
 
-        let food = new Food(name, measurement_unit, serving_size, calories, carbs, protein, fat);
+        let micros = collectMicroFieldValues();
+        let food = new Food(name, measurement_unit, serving_size, calories, carbs, protein, fat, micros);
         let isEditing = (typeof editingItem !== 'undefined' && editingItem && editingItem.type === 'food');
 
         const request = openDatabase();
@@ -278,18 +336,16 @@ function processForm(form) {
                     if (nameChanged) {
                         foodStore.delete(oldName);
                     }
-                    foodStore.put({ name: food.name, measurement_unit: food.measurement_unit, serving_size: food.serving_size, cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat });
+                    foodStore.put(buildFoodRecord(food, micros));
 
                     foodTransaction.oncomplete = function () {
                         if (typeof viewedItems !== 'undefined') {
                             if (nameChanged && viewedItems.has("food:" + oldName)) {
                                 viewedItems.delete("food:" + oldName);
                             }
-                            viewedItems.set("food:" + food.name, {
-                                name: food.name, type: "food",
-                                serving_size: food.serving_size, measurement_unit: food.measurement_unit,
-                                cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat
-                            });
+                            var viewRecord = buildFoodRecord(food, micros);
+                            viewRecord.type = "food";
+                            viewedItems.set("food:" + food.name, viewRecord);
                         }
 
                         if (nameChanged) {
@@ -353,6 +409,8 @@ function processForm(form) {
                 document.getElementById("food_carbs").value = '';
                 document.getElementById("food_protein").value = '';
                 document.getElementById("food_fat").value = '';
+                clearMicroFields();
+                markDataModified();
                 closeForm(form);
             } else {
                 const checkTransaction = db.transaction(["foods", "meals"], "readonly");
@@ -377,7 +435,7 @@ function processForm(form) {
 
                     const saveTransaction = db.transaction("foods", "readwrite");
                     const saveFoodStore = saveTransaction.objectStore("foods");
-                    saveFoodStore.put({ name: food.name, measurement_unit: food.measurement_unit, serving_size: food.serving_size, cals: food.cals, carbs: food.carbs, protein: food.protein, fat: food.fat });
+                    saveFoodStore.put(buildFoodRecord(food, micros));
 
                     saveTransaction.oncomplete = function () {
                         db.close();
@@ -390,6 +448,8 @@ function processForm(form) {
                     document.getElementById("food_carbs").value = '';
                     document.getElementById("food_protein").value = '';
                     document.getElementById("food_fat").value = '';
+                    clearMicroFields();
+                    markDataModified();
                     closeForm(form);
                     if (typeof loadCachedFoods === 'function') {
                         loadCachedFoods(function () {
@@ -496,6 +556,9 @@ function processForm(form) {
 
                     let ingredientsDone = 0;
                     let totalCals = 0, totalCarbs = 0, totalProtein = 0, totalFat = 0;
+                    let totalMicros = {};
+                    let microHasData = {};
+                    let microMissingCount = {};
 
                     for (let i = 0; i < ingredient_list.length; i++) {
                         const food = foodStore.get(ingredient_list[i]);
@@ -505,8 +568,45 @@ function processForm(form) {
                             totalProtein += parseFloat(food.result.protein) * parseFloat(serving_list[i]);
                             totalFat += parseFloat(food.result.fat) * parseFloat(serving_list[i]);
 
+                            if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                                for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                    var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                    if (food.result[mk] != null) {
+                                        totalMicros[mk] = (totalMicros[mk] || 0) + parseFloat(food.result[mk]) * parseFloat(serving_list[i]);
+                                        microHasData[mk] = true;
+                                    } else {
+                                        microMissingCount[mk] = (microMissingCount[mk] || 0) + 1;
+                                    }
+                                }
+                            }
+
                             ingredientsDone++;
                             if (ingredientsDone === ingredient_list.length) {
+                                var missingMicros = [];
+                                if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                                    for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                        var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                        if (microMissingCount[mk] > 0) {
+                                            missingMicros.push(mk);
+                                        }
+                                    }
+                                }
+
+                                var mealRecord = {
+                                    name: name,
+                                    ingredient_list: ingredient_list,
+                                    serving_list: serving_list,
+                                    cals: Math.round(totalCals * 100) / 100,
+                                    carbs: Math.round(totalCarbs * 100) / 100,
+                                    protein: Math.round(totalProtein * 100) / 100,
+                                    fat: Math.round(totalFat * 100) / 100,
+                                    _missingMicros: missingMicros
+                                };
+                                for (var mk in totalMicros) {
+                                    if (totalMicros.hasOwnProperty(mk)) {
+                                        mealRecord[mk] = Math.round(totalMicros[mk] * 100) / 100;
+                                    }
+                                }
 
                                 const mealTransaction = db.transaction("meals", "readwrite");
                                 const mealStore = mealTransaction.objectStore("meals");
@@ -514,15 +614,7 @@ function processForm(form) {
                                 if (mealNameChanged) {
                                     mealStore.delete(mealOldName);
                                 }
-                                mealStore.put({
-                                    name: name,
-                                    ingredient_list: ingredient_list,
-                                    serving_list: serving_list,
-                                    cals: Math.round(totalCals * 100) / 100,
-                                    carbs: Math.round(totalCarbs * 100) / 100,
-                                    protein: Math.round(totalProtein * 100) / 100,
-                                    fat: Math.round(totalFat * 100) / 100
-                                });
+                                mealStore.put(mealRecord);
 
                                 mealTransaction.oncomplete = function () {
                                     if (isEditing) {
@@ -530,15 +622,9 @@ function processForm(form) {
                                             if (mealNameChanged && viewedItems.has("meal:" + mealOldName)) {
                                                 viewedItems.delete("meal:" + mealOldName);
                                             }
-                                            viewedItems.set("meal:" + name, {
-                                                name: name, type: "meal",
-                                                ingredient_list: ingredient_list,
-                                                serving_list: serving_list,
-                                                cals: Math.round(totalCals * 100) / 100,
-                                                carbs: Math.round(totalCarbs * 100) / 100,
-                                                protein: Math.round(totalProtein * 100) / 100,
-                                                fat: Math.round(totalFat * 100) / 100
-                                            });
+                                            var viewMealRecord = JSON.parse(JSON.stringify(mealRecord));
+                                            viewMealRecord.type = "meal";
+                                            viewedItems.set("meal:" + name, viewMealRecord);
                                         }
 
                                         if (mealNameChanged) {
@@ -581,6 +667,7 @@ function processForm(form) {
                         temp_ingredient_list[j].value = '';
                         temp_serving_list[j].value = '1';
                     }
+                    markDataModified();
                     closeForm(form);
                 };
             }
@@ -691,6 +778,14 @@ function processForm(form) {
                                 fat: Math.round(parseFloat(foodToLog.result.fat) * parseFloat(numServings) * 100) / 100,
                                 type: "food"
                             };
+                            if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                                for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                    var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                    if (foodToLog.result[mk] != null) {
+                                        entry[mk] = Math.round(parseFloat(foodToLog.result[mk]) * parseFloat(numServings) * 100) / 100;
+                                    }
+                                }
+                            }
                             if (eatenToday.result === undefined) {
                                 nutritionStore.put({ name: "eatenToday", content: [entry] });
                             } else {
@@ -766,12 +861,22 @@ function processForm(form) {
                                         servingSize: null,
                                         measurementUnit: null,
                                         ingredients: ingredientStrings,
+                                        ingredient_list: mealToLog.result.ingredient_list,
+                                        _missingMicros: mealToLog.result._missingMicros || [],
                                         cals: Math.round(parseFloat(mealToLog.result.cals) * parseFloat(numServings) * 100) / 100,
                                         carbs: Math.round(parseFloat(mealToLog.result.carbs) * parseFloat(numServings) * 100) / 100,
                                         protein: Math.round(parseFloat(mealToLog.result.protein) * parseFloat(numServings) * 100) / 100,
                                         fat: Math.round(parseFloat(mealToLog.result.fat) * parseFloat(numServings) * 100) / 100,
                                         type: "meal"
                                     };
+                                    if (typeof MICRONUTRIENT_DEFINITIONS !== 'undefined') {
+                                        for (var m = 0; m < MICRONUTRIENT_DEFINITIONS.length; m++) {
+                                            var mk = MICRONUTRIENT_DEFINITIONS[m].key;
+                                            if (mealToLog.result[mk] != null) {
+                                                entry[mk] = Math.round(parseFloat(mealToLog.result[mk]) * parseFloat(numServings) * 100) / 100;
+                                            }
+                                        }
+                                    }
                                     if (eatenToday.result === undefined) {
                                         nutritionStore.put({ name: "eatenToday", content: [entry] });
                                     } else {

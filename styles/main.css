@@ -1,4 +1,133 @@
-/* Add text columns */
+/* Theme Variables */
+:root, [data-theme="blue"] {
+    --color-bg-start: rgb(109, 196, 255);
+    --color-bg-end: rgb(0, 102, 255);
+    --color-primary: rgb(0, 86, 198);
+    --color-primary-dark: rgb(0, 0, 139);
+    --color-accent: rgb(0, 110, 255);
+    --color-accent-dark: rgb(0, 55, 255);
+    --color-border: blue;
+    --color-text: white;
+    --color-heading: rgb(0, 51, 255);
+    --color-date: rgb(0, 38, 255);
+    --color-nav-current: blue;
+    --color-nav-current-mobile: rgb(0, 221, 255);
+    --color-nav-overlay: rgba(0, 0, 255, 0.8);
+    --color-input-bg: white;
+    --color-input-text: black;
+    --color-dropdown-bg: white;
+    --color-dropdown-text: black;
+    --color-dropdown-border: #eee;
+    --color-overlay-light: rgba(0, 0, 80, 0.2);
+    --color-cals: maroon;
+    --color-carbs: orange;
+    --color-protein: rgb(214, 185, 146);
+    --color-fat: rgb(0, 65, 0);
+}
+
+[data-theme="green"] {
+    --color-bg-start: rgb(144, 238, 144);
+    --color-bg-end: rgb(34, 139, 34);
+    --color-primary: rgb(46, 125, 50);
+    --color-primary-dark: rgb(27, 94, 32);
+    --color-accent: rgb(56, 142, 60);
+    --color-accent-dark: rgb(33, 110, 37);
+    --color-border: rgb(46, 125, 50);
+    --color-text: white;
+    --color-heading: rgb(27, 94, 32);
+    --color-date: rgb(21, 71, 24);
+    --color-nav-current: rgb(27, 94, 32);
+    --color-nav-current-mobile: rgb(129, 255, 139);
+    --color-nav-overlay: rgba(27, 94, 32, 0.85);
+    --color-input-bg: white;
+    --color-input-text: black;
+    --color-dropdown-bg: white;
+    --color-dropdown-text: black;
+    --color-dropdown-border: #eee;
+    --color-overlay-light: rgba(0, 60, 0, 0.2);
+    --color-cals: maroon;
+    --color-carbs: orange;
+    --color-protein: rgb(214, 185, 146);
+    --color-fat: rgb(0, 65, 0);
+}
+
+[data-theme="purple"] {
+    --color-bg-start: rgb(200, 162, 255);
+    --color-bg-end: rgb(106, 27, 154);
+    --color-primary: rgb(123, 31, 162);
+    --color-primary-dark: rgb(74, 20, 140);
+    --color-accent: rgb(142, 36, 170);
+    --color-accent-dark: rgb(106, 27, 154);
+    --color-border: rgb(128, 0, 128);
+    --color-text: white;
+    --color-heading: rgb(74, 20, 140);
+    --color-date: rgb(62, 12, 114);
+    --color-nav-current: rgb(74, 20, 140);
+    --color-nav-current-mobile: rgb(206, 147, 255);
+    --color-nav-overlay: rgba(74, 20, 140, 0.85);
+    --color-input-bg: white;
+    --color-input-text: black;
+    --color-dropdown-bg: white;
+    --color-dropdown-text: black;
+    --color-dropdown-border: #eee;
+    --color-overlay-light: rgba(60, 0, 80, 0.2);
+    --color-cals: maroon;
+    --color-carbs: orange;
+    --color-protein: rgb(214, 185, 146);
+    --color-fat: rgb(0, 65, 0);
+}
+
+[data-theme="redOrange"] {
+    --color-bg-start: rgb(255, 183, 107);
+    --color-bg-end: rgb(230, 74, 25);
+    --color-primary: rgb(191, 54, 12);
+    --color-primary-dark: rgb(135, 35, 5);
+    --color-accent: rgb(216, 67, 21);
+    --color-accent-dark: rgb(170, 50, 10);
+    --color-border: rgb(191, 54, 12);
+    --color-text: white;
+    --color-heading: rgb(135, 35, 5);
+    --color-date: rgb(110, 25, 0);
+    --color-nav-current: rgb(135, 35, 5);
+    --color-nav-current-mobile: rgb(255, 204, 128);
+    --color-nav-overlay: rgba(135, 35, 5, 0.85);
+    --color-input-bg: white;
+    --color-input-text: black;
+    --color-dropdown-bg: white;
+    --color-dropdown-text: black;
+    --color-dropdown-border: #eee;
+    --color-overlay-light: rgba(80, 20, 0, 0.2);
+    --color-cals: maroon;
+    --color-carbs: orange;
+    --color-protein: rgb(214, 185, 146);
+    --color-fat: rgb(0, 65, 0);
+}
+
+[data-theme="dark"] {
+    --color-bg-start: rgb(40, 40, 40);
+    --color-bg-end: rgb(18, 18, 18);
+    --color-primary: rgb(55, 55, 55);
+    --color-primary-dark: rgb(30, 30, 30);
+    --color-accent: rgb(70, 70, 70);
+    --color-accent-dark: rgb(50, 50, 50);
+    --color-border: rgb(80, 80, 80);
+    --color-text: rgb(230, 230, 230);
+    --color-heading: rgb(100, 149, 237);
+    --color-date: rgb(130, 170, 255);
+    --color-nav-current: rgb(100, 149, 237);
+    --color-nav-current-mobile: rgb(130, 170, 255);
+    --color-nav-overlay: rgba(20, 20, 20, 0.92);
+    --color-input-bg: rgb(50, 50, 50);
+    --color-input-text: rgb(230, 230, 230);
+    --color-dropdown-bg: rgb(50, 50, 50);
+    --color-dropdown-text: rgb(230, 230, 230);
+    --color-dropdown-border: rgb(70, 70, 70);
+    --color-overlay-light: rgba(0, 0, 0, 0.3);
+    --color-cals: rgb(255, 99, 71);
+    --color-carbs: rgb(255, 183, 77);
+    --color-protein: rgb(214, 185, 146);
+    --color-fat: rgb(102, 187, 106);
+}
 
 * {
     padding: 0;
@@ -7,13 +136,13 @@
 }
 
 html {
-    background-image: linear-gradient(rgb(109, 196, 255), rgb(0, 102, 255));
+    background-image: linear-gradient(var(--color-bg-start), var(--color-bg-end));
 }
 
 body {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 100%;
-    color: white;
+    color: var(--color-text);
 }
 
 
@@ -28,11 +157,11 @@ header {
     display: flex;
     align-items: center;
     flex-direction: column;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 header h2 {
-    color: white;
+    color: var(--color-text);
     font-weight: bold;
     text-align: center;
 }
@@ -52,8 +181,8 @@ nav ul {
     display: flex;
     list-style-type: none;
     justify-content: center;
-    border-bottom: 3px solid blue;
-    background-color: rgb(0, 110, 255);
+    border-bottom: 3px solid var(--color-border);
+    background-color: var(--color-accent);
 }
 
 nav ul li a {
@@ -61,22 +190,22 @@ nav ul li a {
     display: block;
     text-decoration: none;
     text-align: center;
-    color: white;
+    color: var(--color-text);
     transition: all 300ms;
 }
 
 nav ul li a:hover {
-    background-color: darkblue;
+    background-color: var(--color-primary-dark);
     cursor: pointer;
 }
 
 #current {
-    color: blue;
+    color: var(--color-nav-current);
     font-weight: bold;
 }
 
 #current:hover {
-    color: white;
+    color: var(--color-text);
 }
 
 #show_nav_menu_button {
@@ -93,13 +222,13 @@ main h2 {
 
 main #nutrition {
     padding: 0 3vh;
-    color: rgb(0, 51, 255);
+    color: var(--color-heading);
 }
 
 #nutrition_info {
     display: flex;
     padding-bottom: 5vh;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 #nutrition_info #nutrition_text {
@@ -116,14 +245,14 @@ main #nutrition {
 main #calories {
     padding: 5vh 3vh 0 0;
     text-align: right;
-    color: rgb(0, 51, 255);
+    color: var(--color-heading);
 }
 
 #calories_info {
     display: flex;
     flex-direction: row-reverse;
     padding-bottom: 5vh;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 #calories_info #calories_text {
@@ -139,13 +268,13 @@ main #calories {
 
 main #micronutrients {
     padding: 5vh 0 0 3vh;
-    color: rgb(0, 51, 255);
+    color: var(--color-heading);
 }
 
 #micronutrients_info {
     display: flex;
     padding-bottom: 5vh;
-    border-bottom: 3px solid blue;
+    border-bottom: 3px solid var(--color-border);
 }
 
 #micronutrients_info #micronutrients_text {
@@ -166,6 +295,61 @@ footer {
     justify-content: center;
     align-items: center;
     padding: 2vh;
+}
+
+/* Backup Reminder Banner */
+#backup_reminder_banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5vh;
+    padding: 1.2vh 2vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: #f1c40f;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 85%;
+    text-align: center;
+    flex-wrap: wrap;
+    z-index: 1000;
+}
+
+.backup-reminder-actions {
+    display: flex;
+    gap: 1vh;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.backup-reminder-link {
+    padding: 0.4vh 1.5vh;
+    background-color: #27ae60;
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 90%;
+    transition: background-color 200ms ease;
+}
+
+.backup-reminder-link:hover {
+    background-color: #1e8449;
+}
+
+.backup-reminder-dismiss {
+    padding: 0.4vh 1.5vh;
+    background-color: transparent;
+    color: #aaa;
+    border: 1px solid #666;
+    border-radius: 3px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 90%;
+    cursor: pointer;
+    transition: all 200ms ease;
+}
+
+.backup-reminder-dismiss:hover {
+    color: white;
+    border-color: white;
 }
 
 @media screen and (min-width: 280px) and (max-width: 767px) {
@@ -201,7 +385,7 @@ footer {
     }
 
     #current {
-        color: rgb(0, 221, 255);
+        color: var(--color-nav-current-mobile);
     }
 
     #navigation_menu {
@@ -211,7 +395,7 @@ footer {
         right: 0;
         width: 65vw;
         height: 100vh;
-        background-color: rgba(0, 0, 255, 0.8);
+        background-color: var(--color-nav-overlay);
         transform: translateX(100%);
         transition: all 300ms;
     }

@@ -25,6 +25,8 @@
                 <li><a href="how_to_use.html">How To Use</a></li>
                 <li><a id="current" href="foods_and_meals.html">Foods and Meals</a></li>
                 <li><a href="todays_nutrition.html">Today's Nutrition</a></li>
+                <li><a href="eating_regimens.html">Eating Regimens</a></li>
+                <li><a href="settings.html">Settings</a></li>
             </ul>
         </nav>
 
@@ -36,11 +38,12 @@
             </div>
 
             <div id="food_meal_forms">
-                <div id="add_food_choice" style="display:none;">
+                    <div id="add_food_choice" style="display:none;">
                     <h3>How would you like to add a food?</h3>
                     <div id="add_food_choice_buttons">
                         <button type="button" id="manual_add_btn">Manual Add</button>
                         <button type="button" id="auto_add_btn">Auto Add</button>
+                        <button type="button" id="scan_label_btn">Scan Label</button>
                     </div>
                     <button class="quit" type="button" id="add_food_choice_quit">Quit</button>
                 </div>
@@ -55,6 +58,11 @@
                     <p>Fat (in grams): <input type="number" id="food_fat" step="any" min="0" autocomplete="off"></p>
                     <p>Carbs (in grams): <input type="number" id="food_carbs" step="any" min="0" autocomplete="off"></p>
                     <p>Protein (in grams): <input type="number" id="food_protein" step="any" min="0" autocomplete="off"></p>
+
+                    <div id="micro_fields_section" style="display:none;">
+                        <button type="button" id="micro_fields_toggle" onclick="toggleMicroFields()">Micronutrients (optional)</button>
+                        <div id="micro_fields_content"></div>
+                    </div>
 
                     <div id="add_food_bottom_buttons">
                         <button class="submit" type="button" onclick="processForm(addFoodForm)">Submit</button>
@@ -115,6 +123,26 @@
                     </div>
                 </div>
 
+                <div id="scan_label_form" style="display:none;">
+                    <h3>Scan a Nutrition Label</h3>
+                    <div id="label_source_buttons">
+                        <button type="button" id="label_camera_btn">Take Photo</button>
+                        <button type="button" id="label_upload_btn">Upload Image</button>
+                    </div>
+                    <input type="file" id="label_file_input" accept="image/*" style="display:none;">
+                    <div id="label_camera_container" style="display:none;">
+                        <video id="label_camera_video" autoplay playsinline></video>
+                        <button type="button" id="label_capture_btn" class="submit">Capture</button>
+                    </div>
+                    <canvas id="label_canvas" style="display:none;"></canvas>
+                    <img id="label_preview" alt="Label preview">
+                    <button type="button" id="label_scan_btn" style="display:none;">Scan</button>
+                    <div id="label_loading" style="display:none;">
+                        <p class="loading-text">Scanning label...</p>
+                    </div>
+                    <button class="quit" type="button" onclick="closeLabelReader()">Quit</button>
+                </div>
+
                 <form id="add_meal_form">
                     <h3>Provide the following data for your meal to add it to the registry:</h3>
                     <h4><span class="error"></span></h4>
@@ -170,13 +198,15 @@
         <p>&copy; <span id="copyright"></span> Jason Ciampa</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="data/brand_owners.js"></script>
     <script src="data/restaurant_foods.js"></script>
     <script src="data/general_foods.js"></script>
+    <script src="scripts/main.js"></script>
     <script src="scripts/usda_api.js"></script>
     <script src="scripts/auto_add.js"></script>
-    <script src="scripts/foods_and_meals.js"></script>
     <script src="scripts/nutrition_database.js"></script>
-    <script src="scripts/main.js"></script>
+    <script src="scripts/foods_and_meals.js"></script>
+    <script src="scripts/label_reader.js"></script>
 </body>
 </html>

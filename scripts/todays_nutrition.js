@@ -49,26 +49,27 @@ function renderRegimenDisplay() {
                 select.appendChild(opt);
             }
 
+            var deactivateBtn = document.createElement('button');
+            deactivateBtn.id = 'deactivate_regimen_btn';
+            deactivateBtn.textContent = 'Deactivate';
+            deactivateBtn.style.display = activeRegimen ? '' : 'none';
+            deactivateBtn.addEventListener('click', function () {
+                localStorage.setItem('activeRegimen', '');
+                select.value = '';
+                deactivateBtn.style.display = 'none';
+                updateMacroGoalDisplay();
+                renderMicroTotals();
+            });
+
             select.addEventListener('change', function () {
                 localStorage.setItem('activeRegimen', select.value);
+                deactivateBtn.style.display = select.value ? '' : 'none';
                 updateMacroGoalDisplay();
                 renderMicroTotals();
             });
 
             selectorDiv.appendChild(select);
-
-            if (activeRegimen) {
-                var deactivateBtn = document.createElement('button');
-                deactivateBtn.id = 'deactivate_regimen_btn';
-                deactivateBtn.textContent = 'Deactivate';
-                deactivateBtn.addEventListener('click', function () {
-                    localStorage.setItem('activeRegimen', '');
-                    select.value = '';
-                    updateMacroGoalDisplay();
-                    renderMicroTotals();
-                });
-                selectorDiv.appendChild(deactivateBtn);
-            }
+            selectorDiv.appendChild(deactivateBtn);
 
             container.appendChild(selectorDiv);
         };

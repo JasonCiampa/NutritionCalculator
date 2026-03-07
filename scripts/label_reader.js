@@ -2,38 +2,42 @@ var labelStream = null;
 var labelImageData = null;
 var labelScanActive = false;
 
+var S = '[\\s\\n]*';
+var V = '([\\d,.]+)';
+var OCR_L = '[il1|!]';
+
 var LABEL_PATTERNS = [
-    { pattern: /ca[il1|]or[il1|]es\s*[:\s]*([\d,.]+)/i, key: 'calories', field: 'food_calories' },
-    { pattern: /tota[il1|]\s*fat\s*[:\s]*([\d,.]+)\s*g/i, key: 'fat', field: 'food_fat' },
-    { pattern: /saturated\s*fat\s*[:\s]*([\d,.]+)\s*g/i, key: 'saturatedFat', field: 'food_saturatedFat' },
-    { pattern: /trans\s*fat\s*[:\s]*([\d,.]+)\s*g/i, key: 'transFat', field: 'food_transFat' },
-    { pattern: /cho[il1|]estero[il1|]\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'cholesterol', field: 'food_cholesterol' },
-    { pattern: /sod[il1|]um\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'sodium', field: 'food_sodium' },
-    { pattern: /tota[il1|]\s*carb(?:ohydrate)?s?\s*[:\s]*([\d,.]+)\s*g/i, key: 'carbs', field: 'food_carbs' },
-    { pattern: /d[il1|]etary\s*f[il1|]ber\s*[:\s]*([\d,.]+)\s*g/i, key: 'fiber', field: 'food_fiber' },
-    { pattern: /tota[il1|]\s*sugars?\s*[:\s]*([\d,.]+)\s*g/i, key: 'sugars', field: 'food_sugars' },
-    { pattern: /(?:inc[il1|]\.?\s*)?added\s*sugars?\s*[:\s]*([\d,.]+)\s*g/i, key: 'addedSugars', field: 'food_addedSugars' },
-    { pattern: /prote[il1|]n\s*[:\s]*([\d,.]+)\s*g/i, key: 'protein', field: 'food_protein' },
-    { pattern: /v[il1|]tam[il1|]n\s*d\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'vitaminD', field: 'food_vitaminD' },
-    { pattern: /ca[il1|]c[il1|]um\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'calcium', field: 'food_calcium' },
-    { pattern: /[il1|]ron\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'iron', field: 'food_iron' },
-    { pattern: /potass[il1|]um\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'potassium', field: 'food_potassium' },
-    { pattern: /v[il1|]tam[il1|]n\s*a\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'vitaminA', field: 'food_vitaminA' },
-    { pattern: /v[il1|]tam[il1|]n\s*c\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'vitaminC', field: 'food_vitaminC' },
-    { pattern: /v[il1|]tam[il1|]n\s*e\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'vitaminE', field: 'food_vitaminE' },
-    { pattern: /v[il1|]tam[il1|]n\s*k\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'vitaminK', field: 'food_vitaminK' },
-    { pattern: /th[il1|]am[il1|]n\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'thiamin', field: 'food_thiamin' },
-    { pattern: /r[il1|]bof[il1|]av[il1|]n\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'riboflavin', field: 'food_riboflavin' },
-    { pattern: /n[il1|]ac[il1|]n\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'niacin', field: 'food_niacin' },
-    { pattern: /v[il1|]tam[il1|]n\s*b-?6\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'vitaminB6', field: 'food_vitaminB6' },
-    { pattern: /fo[il1|]ate\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'folate', field: 'food_folate' },
-    { pattern: /v[il1|]tam[il1|]n\s*b-?12\s*[:\s]*([\d,.]+)\s*m?cg/i, key: 'vitaminB12', field: 'food_vitaminB12' },
-    { pattern: /phosphorus\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'phosphorus', field: 'food_phosphorus' },
-    { pattern: /magnes[il1|]um\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'magnesium', field: 'food_magnesium' },
-    { pattern: /z[il1|]nc\s*[:\s]*([\d,.]+)\s*m?g/i, key: 'zinc', field: 'food_zinc' }
+    { pattern: new RegExp('ca' + OCR_L + 'or' + OCR_L + 'es' + S + '[:\\s]?' + S + V, 'i'), key: 'calories' },
+    { pattern: new RegExp('tota' + OCR_L + S + 'fat' + S + '[:\\s]?' + S + V + S + 'g', 'i'), key: 'fat' },
+    { pattern: new RegExp('saturated' + S + 'fat' + S + '[:\\s]?' + S + V + S + 'g', 'i'), key: 'saturatedFat' },
+    { pattern: new RegExp('trans' + S + 'fat' + S + '[:\\s]?' + S + V + S + 'g', 'i'), key: 'transFat' },
+    { pattern: new RegExp('cho' + OCR_L + 'estero' + OCR_L + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'cholesterol' },
+    { pattern: new RegExp('sod' + OCR_L + 'um' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'sodium' },
+    { pattern: new RegExp('tota' + OCR_L + S + 'carb(?:ohydrate)?' + 's?' + S + '[:\\s]?' + S + V + S + 'g', 'i'), key: 'carbs' },
+    { pattern: new RegExp('d' + OCR_L + 'etary' + S + 'f' + OCR_L + 'ber' + S + '[:\\s]?' + S + V + S + 'g', 'i'), key: 'fiber' },
+    { pattern: new RegExp('tota' + OCR_L + S + 'sugars?' + S + '[:\\s]?' + S + V + S + 'g', 'i'), key: 'sugars' },
+    { pattern: new RegExp('(?:' + OCR_L + 'nc' + OCR_L + '\\.?\\s*)?added' + S + 'sugars?' + S + '[:\\s]?' + S + V + S + 'g', 'i'), key: 'addedSugars' },
+    { pattern: new RegExp('prote' + OCR_L + 'n' + S + '[:\\s]?' + S + V + S + 'g', 'i'), key: 'protein' },
+    { pattern: new RegExp('v' + OCR_L + 'tam' + OCR_L + 'n' + S + 'd' + S + '[:\\s]?' + S + V + S + 'm?cg', 'i'), key: 'vitaminD' },
+    { pattern: new RegExp('ca' + OCR_L + 'c' + OCR_L + 'um' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'calcium' },
+    { pattern: new RegExp(OCR_L + 'ron' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'iron' },
+    { pattern: new RegExp('potass' + OCR_L + 'um' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'potassium' },
+    { pattern: new RegExp('v' + OCR_L + 'tam' + OCR_L + 'n' + S + 'a' + S + '[:\\s]?' + S + V + S + 'm?cg', 'i'), key: 'vitaminA' },
+    { pattern: new RegExp('v' + OCR_L + 'tam' + OCR_L + 'n' + S + 'c' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'vitaminC' },
+    { pattern: new RegExp('v' + OCR_L + 'tam' + OCR_L + 'n' + S + 'e' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'vitaminE' },
+    { pattern: new RegExp('v' + OCR_L + 'tam' + OCR_L + 'n' + S + 'k' + S + '[:\\s]?' + S + V + S + 'm?cg', 'i'), key: 'vitaminK' },
+    { pattern: new RegExp('th' + OCR_L + 'am' + OCR_L + 'n' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'thiamin' },
+    { pattern: new RegExp('r' + OCR_L + 'bof' + OCR_L + 'av' + OCR_L + 'n' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'riboflavin' },
+    { pattern: new RegExp('n' + OCR_L + 'ac' + OCR_L + 'n' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'niacin' },
+    { pattern: new RegExp('v' + OCR_L + 'tam' + OCR_L + 'n' + S + 'b-?6' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'vitaminB6' },
+    { pattern: new RegExp('fo' + OCR_L + 'ate' + S + '[:\\s]?' + S + V + S + 'm?cg', 'i'), key: 'folate' },
+    { pattern: new RegExp('v' + OCR_L + 'tam' + OCR_L + 'n' + S + 'b-?12' + S + '[:\\s]?' + S + V + S + 'm?cg', 'i'), key: 'vitaminB12' },
+    { pattern: new RegExp('phosphorus' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'phosphorus' },
+    { pattern: new RegExp('magnes' + OCR_L + 'um' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'magnesium' },
+    { pattern: new RegExp('z' + OCR_L + 'nc' + S + '[:\\s]?' + S + V + S + 'm?g', 'i'), key: 'zinc' }
 ];
 
-var SERVING_SIZE_PATTERN = /serv[il1|]ng\s*s[il1|]ze\s*[:\s]*([\d.\/]+)\s*([a-zA-Z()\/\s]+?)(?:\s*\([\d.]+\s*g\))?$/im;
+var SERVING_SIZE_PATTERN = new RegExp('serv' + OCR_L + 'ng' + S + 's' + OCR_L + 'ze' + S + '[:\\s]?' + S + '([\\d.\\/]+)' + S + '([a-zA-Z()\\/\\s]+?)(?:\\s*\\([\\d.]+\\s*g\\))?$', 'im');
 
 function initLabelReader() {
     var cameraBtn = document.getElementById('label_camera_btn');
@@ -137,8 +141,8 @@ function preprocessImage(imageDataUrl, callback) {
     img.onload = function () {
         var canvas = document.createElement('canvas');
         var scale = Math.max(1, 2000 / Math.max(img.width, img.height));
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
         var ctx = canvas.getContext('2d');
 
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -146,13 +150,20 @@ function preprocessImage(imageDataUrl, callback) {
         var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         var data = imageData.data;
 
+        var sumGray = 0;
+        var pixelCount = data.length / 4;
         for (var i = 0; i < data.length; i += 4) {
-            var gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            var contrast = ((gray / 255 - 0.5) * 1.8 + 0.5) * 255;
-            var bw = contrast > 140 ? 255 : 0;
-            data[i] = bw;
-            data[i + 1] = bw;
-            data[i + 2] = bw;
+            sumGray += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+        }
+        var avgGray = sumGray / pixelCount;
+        var threshold = avgGray > 160 ? 140 : avgGray > 100 ? 120 : 100;
+
+        for (var j = 0; j < data.length; j += 4) {
+            var gray = 0.299 * data[j] + 0.587 * data[j + 1] + 0.114 * data[j + 2];
+            var bw = gray > threshold ? 255 : 0;
+            data[j] = bw;
+            data[j + 1] = bw;
+            data[j + 2] = bw;
         }
 
         ctx.putImageData(imageData, 0, 0);
@@ -197,7 +208,8 @@ function parseLabelText(text) {
         .replace(/[—–]/g, '-')
         .replace(/[''`]/g, "'")
         .replace(/[""]/g, '"')
-        .replace(/\r\n/g, '\n');
+        .replace(/\r\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n');
 
     for (var i = 0; i < LABEL_PATTERNS.length; i++) {
         var match = cleaned.match(LABEL_PATTERNS[i].pattern);
@@ -207,7 +219,23 @@ function parseLabelText(text) {
         }
     }
 
+    if (Object.keys(results).length < 3) {
+        var collapsed = cleaned.replace(/\n/g, ' ').replace(/\s{2,}/g, ' ');
+        for (var j = 0; j < LABEL_PATTERNS.length; j++) {
+            if (results[LABEL_PATTERNS[j].key] != null) continue;
+            var match2 = collapsed.match(LABEL_PATTERNS[j].pattern);
+            if (match2) {
+                var numStr2 = match2[1].replace(/,/g, '');
+                results[LABEL_PATTERNS[j].key] = parseFloat(numStr2);
+            }
+        }
+    }
+
     var servingMatch = cleaned.match(SERVING_SIZE_PATTERN);
+    if (!servingMatch) {
+        var collapsed2 = cleaned.replace(/\n/g, ' ').replace(/\s{2,}/g, ' ');
+        servingMatch = collapsed2.match(SERVING_SIZE_PATTERN);
+    }
     if (servingMatch) {
         results.servingSize = servingMatch[1];
         results.servingUnit = servingMatch[2].trim();

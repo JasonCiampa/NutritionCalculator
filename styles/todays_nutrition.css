@@ -347,10 +347,12 @@ input {
 #daily_nutrition_log #macros {
     display: flex;
     justify-content: space-evenly;
+    flex-wrap: wrap;
 }
 
 #macros {
-    padding: 0 1vh;
+    padding: 0 1vh 1vh 1vh;
+    border-bottom: 2px solid var(--color-border);
 }
 
 #cals {
@@ -431,7 +433,6 @@ input {
 #micro_totals_section {
     width: 100%;
     padding: 1vh 2vh;
-    border-top: 2px solid var(--color-border);
 }
 
 #micro_totals_toggle {
@@ -545,6 +546,7 @@ input {
     #daily_nutrition_log #macros {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         justify-content: space-evenly;
         align-items: center;
     }
@@ -558,6 +560,7 @@ input {
     #daily_nutrition_log #macros {
         display: flex;
         flex-direction: column;
+        flex-wrap: wrap;
         justify-content: space-evenly;
         align-items: center;
     }
